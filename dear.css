@@ -7,3 +7,28 @@ border-radius:20px;
 
 
 }
+#middlearea{
+    display:flex;
+
+}
+#sidebar{
+    border: 2px solid black;
+        height: 83vh;
+        width: 15vw;
+        background-image: linear-gradient(135deg, rgb(115, 255, 0), yellow);
+        border-radius: 20px;
+}
+#indiaarea{
+    border: 2px solid black;
+        height: 83vh;
+        width: 84vw;
+        background-image: linear-gradient(135deg, rgb(115, 255, 0), yellow);
+        border-radius: 20px;
+}
+#footer{
+border: 2px solid black;
+    height: 8vh;
+    width: 98vw;
+    background-image: linear-gradient(135deg, orange, yellow);
+    border-radius: 20px;
+}
