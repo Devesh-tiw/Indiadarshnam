@@ -64,20 +64,27 @@
 
    
     <div id="sidebar">
-     <label for="erarange">Select Era:</label>
+      <div id="eraselect">
+     <label for="erarange" style="  color:black;">Select Era:</label>
     
-    <input type="range" id="erarange" min="500" max="2026" value="2026" oninput="updateEra(this.value)">
+    <input type="range" id="erarange" min="-2000" max="2026" value="2026" oninput="updateEra(this.value)">
     
     <p id="eraprint"></p>
-
+</div>
+<div class="number-of-sites">
+  <div class="sites-count" id="siteCount">0</div>
+  <div class="sites-text">heritage sites<br>visible on map</div>
+</div>
     </div>
 
 
-    <div id="indiaarea">
+
+
+    <div id="indiaarea" style="  color:black;">
 MainSection
         </div>
     </div>
-    <div id="footer">Footer</div>s
+    <div id="footer">Footer</div>
     
 
 
