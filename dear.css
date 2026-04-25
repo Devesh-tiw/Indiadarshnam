@@ -1,62 +1,63 @@
-*{
-    color:white;
-   
-}
-div{
-    margin:1px;
-}
-body{
-background-image: radial-gradient(circle, yellow, rgb(255, 255, 255));
-position:static;
-color:black;
-}
-#header{
-    border:2px solid black;
-    height:8vh;
-    width:98vw;
-background-image: linear-gradient(to top right, rgb(255, 255, 255), rgb(58, 58, 3));
-border-radius:20px;
-
+* {
+    color: white;
 
 }
-#middlearea{
-    display:flex;
 
+div {
+    margin: 1px;
 }
-#sidebar{
+
+body {
+    background-image: radial-gradient(circle, yellow, rgb(255, 255, 255));
+    position: static;
+    color: black;
+}
+
+#header {
     border: 2px solid black;
-        height: 83vh;
-        width: 18vw;
-background-image: radial-gradient(circle, rgb(255, 140, 0), rgb(180, 172, 32));
-        border-radius: 20px;
-}
-#eraselect{
-  
-    border-radius:80px;
-    border:1px solid black;
-    margin:10px;
-    text-align:center;
-}
-.number-of-sites{
-    border:1px solid black;
-    border-radius:60px;
-    margin:10px;
-    text-align:center;
-    color:black;
-}
-#indiaarea{
-    border: 2px solid black;
-        height: 83vh;
-        width: 81vw;
-background-image: radial-gradient(circle, rgb(255, 153, 0), rgb(182, 178, 38));
-        border-radius: 20px;
-        text-align:center;
-}
-#footer{
-border: 2px solid black;
     height: 8vh;
     width: 98vw;
-background-image: radial-gradient(circle, rgb(255, 0, 0), rgb(190, 112, 10));
-text-align:center;
+    background-image: linear-gradient(to top right, rgb(255, 255, 255), rgb(58, 58, 3));
+    border-radius: 20px;
+
+
+}
+
+#middlearea {
+    display: flex;
+
+}
+
+#sidebar {
+    border: 2px solid black;
+    height: 83vh;
+    width: 18vw;
+    background-image: radial-gradient(circle, rgb(255, 140, 0), rgb(180, 172, 32));
+    border-radius: 20px;
+}
+
+#eraselect {
+
+    border-radius: 80px;
+    border: 1px solid black;
+    margin: 10px;
+    text-align: center;
+}
+
+#indiaarea {
+    border: 2px solid black;
+    height: 83vh;
+    width: 81vw;
+    background-image: radial-gradient(circle, rgb(255, 153, 0), rgb(182, 178, 38));
+    border-radius: 20px;
+    text-align: center;
+}
+
+#footer {
+    border: 2px solid black;
+    height: 8vh;
+    width: 98vw;
+    background-image: radial-gradient(circle, rgb(255, 0, 0), rgb(190, 112, 10));
+    text-align: center;
     border-radius: 20px;
 }
