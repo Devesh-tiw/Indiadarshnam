@@ -37,6 +37,13 @@ background-image: radial-gradient(circle, rgb(255, 140, 0), rgb(180, 172, 32));
     margin:10px;
     text-align:center;
 }
+.number-of-sites{
+    border:1px solid black;
+    border-radius:60px;
+    margin:10px;
+    text-align:center;
+    color:black;
+}
 #indiaarea{
     border: 2px solid black;
         height: 83vh;
