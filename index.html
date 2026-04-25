@@ -8,11 +8,16 @@
 </head>
 <body>
     <div id="header" style="display:flex">
-  <img src="/images/unnamed-removebg-preview (1).png" height="80px" width:80px;><p>Header Area</p>
+  <img src="/Indiadarshnam/images/image.png" height="40px" width:80px;>
     </div>
-    <div id="middlearea">  
+    <div id="middlearea"> 
+   
     <div id="sidebar">
-  this is Side BAR
+     <label for="erarange">Select Era:</label>
+    
+    <input type="range" id="erarange" min="500" max="2026" value="2026" oninput="updateEra(this.value)">
+    
+    <p id="eraprint"></p>
     </div>
 
 
