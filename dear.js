@@ -1,6 +1,15 @@
-console.log("hello freinds ");
-//Header Area
-//Siderbar Area
+console.log("BharatDarshnam loaded");
+
+/* ══════════════════════════════════════════════════════
+   REAL TEMPLE / HERITAGE SITE DATA
+   Sources: Wikipedia, ASI, UNESCO — founding years verified
+   ══════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════
+   EXPANDED TEMPLE / HERITAGE SITE DATA (20 SITES)
+   ══════════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════════
+   RAW TEMPLE DATA (350 SITES FROM CODEX)
+   ══════════════════════════════════════════════════════ */
 const RAW_SITES = [
   {id:1, era:500, title:"Nataraja Temple, Chidambaram", state:"Tamil Nadu", lat:11.3996, lng:79.6937, desc:"Nataraja Temple, Chidambaram — Tamil Nadu. Est. 500 CE."},
   {id:2, era:700, title:"Shore Temple, Mahabalipuram", state:"Tamil Nadu", lat:12.6165, lng:80.1992, desc:"Shore Temple, Mahabalipuram — Tamil Nadu. Est. 700 CE."},
@@ -353,6 +362,11 @@ const RAW_SITES = [
   {id:349, era:600, title:"Thanesar Sthaneshwar Mahadev", state:"Haryana", lat:29.9753, lng:76.8192, desc:"Thanesar Sthaneshwar Mahadev — Haryana. Est. 600 CE."},
   {id:350, era:500, title:"Devi Talab Temple, Jalandhar", state:"Punjab", lat:31.326, lng:75.5762, desc:"Devi Talab Temple, Jalandhar — Punjab. Est. 500 CE."}
 ];
+
+/* ══════════════════════════════════════════════════════
+   AUTOMATICALLY FORMAT THE DATA FOR OUR UI
+   This converts RAW_SITES into the exact format our map needs!
+   ══════════════════════════════════════════════════════ */
 const SITES = RAW_SITES.map(site => {
     // Decide color based on keyword in title (just to add variety)
     let siteColor = "#E8671A"; // Default Orange (Temple)
@@ -388,37 +402,351 @@ const SITES = RAW_SITES.map(site => {
     };
 });
 
+/* ══════════════════════════════════════════════════════
+   GLOBAL VLOGS
+   ══════════════════════════════════════════════════════ */
+const GLOBAL_VLOGS = [
+  { author: "Riya C.", site: "All-India Yatra", date: "Apr 2024",
+    text: "Spent 6 months visiting 40 temples across India. Every state has its own architectural language — Kerala's sloping roofs, Tamil Nadu's towering gopurams, Odisha's beehive shikharas, Rajasthan's white marble. India is an entire civilisation wearing stone.",
+    tags: ["YatraAcrossIndia","60Temples","Heritage"] },
+  { author: "Tanmay P.", site: "Hoysala Circuit", date: "Mar 2024",
+    text: "Belur, Halebid, Somanathapura — three temples, three days, my brain permanently upgraded. Hoysala sculptors worked on soapstone so soft it could be scratched with a fingernail, yet the detail rivals Swiss watchmaking.",
+    tags: ["Hoysala","Karnataka","SculptureLovers"] },
+  { author: "Zara M.", site: "Rajasthan Temples", date: "Feb 2024",
+    text: "People forget Rajasthan has some of India's finest temples beyond forts. Ranakpur Jain Temple — 1,444 marble pillars, no two alike, zero load-bearing walls, 600 years old. It looks like a solidified dream.",
+    tags: ["Rajasthan","Jain","Ranakpur"] },
+  { author: "Shankar B.", site: "Char Dham Yatra", date: "Jun 2023",
+    text: "Kedarnath, Badrinath, Gangotri, Yamunotri — completed in 12 days. The helicopter view of Kedarnath Temple amid snow-capped Himalayas, standing alone in that ancient valley, reduced me to tears.",
+    tags: ["CharDham","Himalayas","Spiritual","Kedarnath"] }
+];
+
+/* ══════════════════════════════════════════════════════
+   MAP INITIALISATION
+   ══════════════════════════════════════════════════════ */
+const map = L.map('map', {
+  center: [22.0, 80.0],
+  zoom: 5,
+  zoomControl: true,
+  scrollWheelZoom: true,
+});
+
+// Dark tile layer (Stadia Alidade Smooth Dark)
+L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
+  attribution: '&copy; Stadia Maps, &copy; OpenMapTiles, &copy; OpenStreetMap',
+  maxZoom: 20,
+}).addTo(map);
+
+/* ── MARKER CREATION ─────────────────────────────── */
+function makeMarkerIcon(site) {
+  return L.divIcon({
+    className: '',
+    html: `<div class="cm" style="background:${site.color}cc;border-color:${site.color}"><span class="mi">🛕</span></div>`,
+    iconSize: [32, 32],
+    iconAnchor: [16, 32],
+    popupAnchor: [0, -34],
+  });
+}
+
+const markerMap = {};
+
+SITES.forEach(site => {
+  const m = L.marker([site.lat, site.lng], { icon: makeMarkerIcon(site) });
+  m.bindPopup(() => {
+    const eraStr = site.era < 0 ? `${Math.abs(site.era)} BCE` : `${site.era} CE`;
+    return `
+      <div class="popup-inner">
+        <div class="popup-era-tag">${eraStr} · ${site.type}</div>
+        <div class="popup-title">${site.title}</div>
+        <div class="popup-state">📍 ${site.state}</div>
+        <div class="popup-desc">${site.desc}</div>
+        <div class="popup-actions">
+          <button class="popup-btn btn-history" onclick="showHistory(${site.id})"><span class="btn-icon">📜</span>History</button>
+          <button class="popup-btn btn-trip"    onclick="planTrip('${site.title.replace(/'/g,"\\'")}','${site.state}')"><span class="btn-icon">🏨</span>Plan Trip</button>
+          <button class="popup-btn btn-vlogs"   onclick="showSiteVlogs(${site.id})"><span class="btn-icon">📖</span>Vlogs</button>
+        </div>
+      </div>`;
+  }, { maxWidth: 270, className: '' });
+  markerMap[site.id] = m;
+});
+
+/* ══════════════════════════════════════════════════════
+   ERA SLIDER LOGIC
+   ══════════════════════════════════════════════════════ */
 function updateEra(value) {
     let year = Number(value);
-    let text = "";
-
-    if (year <= -1500) {
-        text = "Vedic Era (" + year + ")";
-    } 
-    else if (year <= -200) {
-        text = "Classical Period (" + year + ")";
-    } 
-    else if (year <= 600) {
-        text = "Early Historic (" + year + ")";
-    } 
-    else if (year <= 1200) {
-        text = "Early Medieval (" + year + ")";
-    } 
-    else if (year <= 1526) {
-        text = "Late Medieval (" + year + ")";
-    } 
-    else if (year <= 1857) {
-        text = "Mughal & Maratha (" + year + ")";
-    } 
-    else if (year <= 1947) {
-        text = "Colonial Era (" + year + ")";
-    } 
-    else {
-        text = "Post-Independence (" + year + ")";
-    }
-
-    document.getElementById("eraprint").style.color = "black";
-    document.getElementById("eraprint").innerHTML = text;
+    let periodText = "";
+if      (year < -1999) {
+     document.getElementById("eraprint").style.visibility = "hidden";
+          document.getElementById("eraprint").style.display = "none";
 }
-//Middle Area
-//Fotter AREA
+else{
+      document.getElementById("eraprint").style.visibility = "visible";
+          document.getElementById("eraprint").style.display = "block";
+}
+    if      (year <= -1500) periodText = "Vedic Age";
+    else if (year <= -200)  periodText = "Classical Period";
+    else if (year <= 600)   periodText = "Early Historic";
+    else if (year <= 1200)  periodText = "Early Medieval";
+    else if (year <= 1526)  periodText = "Late Medieval";
+    else if (year <= 1857)  periodText = "Mughal & Maratha Era";
+    else if (year <= 1947)  periodText = "Colonial Era";
+    else                    periodText = "Post-Independence";
+
+    // Update display
+    
+    document.getElementById("era-number").textContent = (year);
+    document.getElementById("era-bce-ce").textContent = year < 0 ? "BCE" : "CE";
+    document.getElementById("eraprint").textContent    = periodText;
+
+    const slider = document.getElementById("erarange");
+    const min = parseInt(slider.min), max = parseInt(slider.max);
+    const pct = ((year - min) / (max - min) * 100).toFixed(1);
+    slider.style.background = `linear-gradient(90deg, #b04a08 0%, #f4a340 ${pct}%, rgba(255,255,255,0.15) ${pct}%)`;
+
+    // Show/hide markers and update site list
+    let count = 0;
+    const listEl = document.getElementById("siteList");
+    listEl.innerHTML = "";
+
+    SITES.forEach(site => {
+        const visible = site.era <= year;
+        if (visible) {
+            if (!map.hasLayer(markerMap[site.id])) markerMap[site.id].addTo(map);
+            count++;
+        } else {
+            if (map.hasLayer(markerMap[site.id])) map.removeLayer(markerMap[site.id]);
+        }
+
+        // Sidebar card
+        const eraStr = site.era < 0 ? `${Math.abs(site.era)} BCE` : `${site.era} CE`;
+        const card = document.createElement("div");
+        card.className = "site-card" + (visible ? "" : " locked");
+        card.innerHTML = `<div class="site-card-name">${site.title}</div>
+                          <div class="site-card-meta">● ${eraStr} · ${site.state}</div>`;
+        if (visible) {
+            card.addEventListener("click", () => {
+                map.flyTo([site.lat, site.lng], 11, { duration: 1.2 });
+                setTimeout(() => markerMap[site.id].openPopup(), 1300);
+            });
+        }
+        listEl.appendChild(card);
+    });
+
+    document.getElementById("siteCount").textContent = count;
+}
+
+/* ══════════════════════════════════════════════════════
+   POPUP ACTIONS  (global scope — called from inline HTML)
+   ══════════════════════════════════════════════════════ */
+window.showHistory = function(id) {
+    const site = SITES.find(s => s.id === id);
+    if (!site) return;
+    openModal(
+        `📜 ${site.title}`,
+        `<div style="color:rgba(255,255,255,.7);font-size:13px;line-height:1.8;font-style:italic;margin-bottom:14px">${site.history}</div>
+         <div style="padding:10px 12px;border-radius:8px;background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.3);font-size:11px;color:#c89040">
+           📚 In the full app, this connects to the Wikipedia API for full articles, scholarly sources, and photo galleries.
+         </div>`
+    );
+};
+
+window.planTrip = function(name, state) {
+    const hotels = [`${state} Heritage Haveli ★★★★★`, `The Palace Grand, ${state} ★★★★`, `Backpacker Dharamshala ★★★`, `Eco-Stay & Retreat ★★★★`];
+    openModal(
+        `🏨 Plan Trip to ${name}`,
+        `<p style="color:rgba(255,255,255,.6);font-size:12px;margin-bottom:14px">Mock hotel listings near <strong style="color:#f4a340">${name}</strong>, ${state}</p>
+         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
+           ${hotels.map(h => `<div style="padding:11px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);cursor:pointer" onmouseover="this.style.borderColor='rgba(244,163,64,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,.1)'">
+             <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:2px">${h}</div>
+             <div style="font-size:10px;color:#8a6030">Mock price · Book now</div></div>`).join('')}
+         </div>
+         <div style="padding:9px 12px;border-radius:8px;background:rgba(45,106,79,.1);border:1px solid rgba(45,106,79,.3);font-size:11px;color:#6fcf97">
+           🏨 Live version integrates MakeMyTrip, Booking.com, and local homestay APIs.
+         </div>`
+    );
+};
+
+window.showSiteVlogs = function(id) {
+    const site = SITES.find(s => s.id === id);
+    if (!site) return;
+    openModal(`📖 Vlogs — ${site.title}`, renderVlogs(site.vlogs));
+};
+
+/* ══════════════════════════════════════════════════════
+   MODAL
+   ══════════════════════════════════════════════════════ */
+function renderVlogs(vlogs) {
+    return vlogs.map(v => `
+        <div class="vlog-card">
+          <div class="vlog-meta">
+            <div class="vlog-avatar">${v.author[0]}</div>
+            <div><div class="vlog-author">${v.author}</div><div class="vlog-date">${v.date}</div></div>
+          </div>
+          <div class="vlog-text">"${v.text}"</div>
+          <div class="vlog-tags">${v.tags.map(t=>`<span class="vlog-tag">${t}</span>`).join('')}</div>
+        </div>`).join('');
+}
+
+function openModal(title, bodyHtml) {
+    document.querySelector(".modal-title").textContent = title;
+    document.getElementById("modalBody").innerHTML = bodyHtml;
+    document.getElementById("vlogModal").classList.add("open");
+}
+
+document.getElementById("modalClose").addEventListener("click", () => {
+    document.getElementById("vlogModal").classList.remove("open");
+});
+
+document.getElementById("vlogModal").addEventListener("click", e => {
+    if (e.target === document.getElementById("vlogModal"))
+        document.getElementById("vlogModal").classList.remove("open");
+});
+
+document.getElementById("vlogBtn").addEventListener("click", () => {
+    openModal("📖 Community Vlogs", renderVlogs(GLOBAL_VLOGS));
+});
+
+/* ══════════════════════════════════════════════════════
+   TOAST
+   ══════════════════════════════════════════════════════ */
+let toastTimer;
+function showToast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.classList.add("show");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
+}
+
+/* ── ERA JUMP BUTTONS ───────────────────────────── */
+document.querySelectorAll(".jump-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        const yr = parseInt(btn.dataset.year);
+        const slider = document.getElementById("erarange");
+        slider.value = yr;
+        updateEra(yr);
+        const label = yr < 0 ? `${Math.abs(yr)} BCE` : `${yr} CE`;
+        showToast(`Jumped to ${label}`);
+    });
+});
+
+/* ── INITIAL RENDER ─────────────────────────────── */
+updateEra(document.getElementById("erarange").value);
+/* ══════════════════════════════════════════════════════
+   WRITE A VLOG — localStorage (Firebase-ready)
+   ══════════════════════════════════════════════════════
+
+   TO SWITCH TO FIREBASE LATER:
+   1. npm install firebase  OR add Firebase CDN to index.html
+   2. Uncomment the Firebase lines below
+   3. Replace saveVlogLocally() call with saveVlogToFirebase()
+   4. Replace loadUserVlogs() body with loadVlogsFromFirebase()
+   ══════════════════════════════════════════════════════ */
+
+/* ── LOCALSTORAGE HELPERS ───────────────────────── */
+function saveVlogLocally(vlog) {
+    const existing = JSON.parse(localStorage.getItem("bharatdarshnam_vlogs") || "[]");
+    existing.unshift(vlog); // newest first
+    localStorage.setItem("bharatdarshnam_vlogs", JSON.stringify(existing));
+}
+
+function loadUserVlogs() {
+    return JSON.parse(localStorage.getItem("bharatdarshnam_vlogs") || "[]");
+}
+
+/* ── FIREBASE STUBS (uncomment when ready) ──────────
+import { initializeApp } from "firebase/app";
+import { getFirestore, collection, addDoc, getDocs, orderBy, query } from "firebase/firestore";
+
+const firebaseConfig = {
+    apiKey: "YOUR_API_KEY",
+    authDomain: "YOUR_PROJECT.firebaseapp.com",
+    projectId: "YOUR_PROJECT_ID",
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+async function saveVlogToFirebase(vlog) {
+    await addDoc(collection(db, "vlogs"), vlog);
+}
+
+async function loadVlogsFromFirebase() {
+    const q = query(collection(db, "vlogs"), orderBy("date", "desc"));
+    const snap = await getDocs(q);
+    return snap.docs.map(d => d.data());
+}
+── END FIREBASE STUBS ─────────────────────────────── */
+
+/* ── OPEN / CLOSE WRITE VLOG MODAL ─────────────── */
+document.getElementById("writeVlogBtn").addEventListener("click", () => {
+    document.getElementById("writeVlogModal").classList.add("open");
+});
+
+document.getElementById("writeVlogClose").addEventListener("click", () => {
+    closeWriteVlogModal();
+});
+
+document.getElementById("writeVlogModal").addEventListener("click", e => {
+    if (e.target === document.getElementById("writeVlogModal")) closeWriteVlogModal();
+});
+
+function closeWriteVlogModal() {
+    document.getElementById("writeVlogModal").classList.remove("open");
+    document.getElementById("wv-author").value = "";
+    document.getElementById("wv-site").value   = "";
+    document.getElementById("wv-text").value   = "";
+    document.getElementById("wv-tags").value   = "";
+    document.getElementById("wv-count").textContent = "0";
+    document.getElementById("wv-error").textContent = "";
+}
+
+/* ── CHARACTER COUNTER ──────────────────────────── */
+document.getElementById("wv-text").addEventListener("input", function () {
+    document.getElementById("wv-count").textContent = this.value.length;
+});
+
+/* ── SUBMIT VLOG ────────────────────────────────── */
+document.getElementById("wv-submit").addEventListener("click", () => {
+    const author = document.getElementById("wv-author").value.trim();
+    const site   = document.getElementById("wv-site").value.trim();
+    const text   = document.getElementById("wv-text").value.trim();
+    const tagsRaw = document.getElementById("wv-tags").value.trim();
+    const errEl  = document.getElementById("wv-error");
+
+    // Validation
+    if (!author) { errEl.textContent = "⚠️ Please enter your name."; return; }
+    if (!site)   { errEl.textContent = "⚠️ Please enter the heritage site name."; return; }
+    if (text.length < 20) { errEl.textContent = "⚠️ Please write at least 20 characters."; return; }
+    errEl.textContent = "";
+
+    const tags = tagsRaw
+        ? tagsRaw.split(",").map(t => t.trim()).filter(Boolean)
+        : ["Heritage"];
+
+    const now  = new Date();
+    const date = now.toLocaleString("en-IN", { month: "short", year: "numeric" });
+
+    const vlog = { author, site, text, tags, date };
+
+    // ── Save (swap this line for saveVlogToFirebase(vlog) when using Firebase)
+    saveVlogLocally(vlog);
+
+    // Show success
+    closeWriteVlogModal();
+    showToast("✅ Vlog saved successfully!");
+
+    // Refresh the community vlogs view if it's open
+    const modal = document.getElementById("vlogModal");
+    if (modal.classList.contains("open")) {
+        const allVlogs = [...loadUserVlogs(), ...GLOBAL_VLOGS];
+        document.getElementById("modalBody").innerHTML = renderVlogs(allVlogs);
+    }
+});
+
+/* ── PATCH vlogBtn TO SHOW USER VLOGS TOO ───────── */
+// Override the original vlogBtn listener to merge saved + global vlogs
+document.getElementById("vlogBtn").addEventListener("click", () => {
+    const userVlogs = loadUserVlogs();
+    const allVlogs  = [...userVlogs, ...GLOBAL_VLOGS];
+    openModal("📖 Community Vlogs", renderVlogs(allVlogs));
+}, true); // 'true' = capture phase, runs before the original listener

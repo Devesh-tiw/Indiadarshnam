@@ -10,43 +10,54 @@
 </head>
 
 <body>
-    <div id="header" style="display:flex">
+    <div id="header" style="display:flex; align-items:center; gap:12px;">
         <img src="/Indiadarshnam/images/image.png" height="40" width="80">
+        <button id="vlogBtn">📖 Community Vlogs</button>
+        <button id="writeVlogBtn">✍️ Write a Vlog</button>
     </div>
 
     <div id="middlearea">
         <div id="sidebar">
-            <div id="eraselect">
-                <label for="erarange" style="color:black;">Select Era:</label>
 
-                <input type="range" id="erarange" min="-2000" max="2026" value="2026" oninput="updateEra(this.value)">
-                <p id="eraprint"></p>
+            <!-- Era Slider -->
+            <div id="eraselect">
+                <div style="display:flex; gap:6px; align-items: center;">
+                    <div id="era-number"></div>
+                    <div id="era-bce-ce"></div>
+                </div>
+                <input type="range" id="erarange" min="-2000" max="2026" value="-2000" oninput="updateEra(this.value)">
+                <p id="eraprint" style="visibility: visible;"></p>
             </div>
 
+            <!-- Site Count -->
             <div class="number-of-sites">
                 <div class="sites-count" id="siteCount">0</div>
                 <div class="sites-text">heritage sites<br>visible on map</div>
             </div>
-                        <div class="era-jumps">
-                            <p style="color:black">Jump to Era</p>
-                            <div class="era-jump-grid">
-                                <button class="jump-btn" data-year="-2000">Vedic Age<br>2000 BCE</button>
-                                <br>
-                                <button class="jump-btn" data-year="-200">Classical<br>200 BCE</button>
-                                <br>
-                                <button class="jump-btn" data-year="600">Early Historic<br>600 CE</button>
-                                <br>
-                                <button class="jump-btn" data-year="1000">Early Medieval<br>1000 CE</button>
-                                <br>
-                                <button class="jump-btn" data-year="1500">Late Medieval<br>1500 CE</button>
-                                <br>
-                                <button class="jump-btn" data-year="2026">Present Day<br>2026 CE</button>
-                            </div>
-                        </div>
-                        <div class="site-list-section">
-                            <span class="site-list-label" style="color:black">Heritage Sites</span>
-                            <div id="siteList"></div>
-                        </div>
+
+            <!-- Era Jump Buttons -->
+            <div class="era-jumps">
+                <p style="color:black">Jump to Era</p>
+                <div class="era-jump-grid">
+                    <button class="jump-btn" data-year="-2000">Vedic Age<br>2000 BCE</button>
+                    <br>
+                    <button class="jump-btn" data-year="-200">Classical<br>200 BCE</button>
+                    <br>
+                    <button class="jump-btn" data-year="600">Early Historic<br>600 CE</button>
+                    <br>
+                    <button class="jump-btn" data-year="1000">Early Medieval<br>1000 CE</button>
+                    <br>
+                    <button class="jump-btn" data-year="1500">Late Medieval<br>1500 CE</button>
+                    <br>
+                    <button class="jump-btn" data-year="2026">Present Day<br>2026 CE</button>
+                </div>
+            </div>
+
+            <!-- Site List -->
+            <div class="site-list-section">
+                <span class="site-list-label" style="color:black">Heritage Sites</span>
+                <div id="siteList"></div>
+            </div>
 
         </div>
 
@@ -56,20 +67,60 @@
     </div>
 
     <div id="footer">Footer</div>
+
+    <!-- Modal -->
+    <div id="vlogModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span class="modal-title"></span>
+                <button id="modalClose">✕</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast"></div>
+
+    <!-- Write Vlog Modal -->
+    <div id="writeVlogModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span class="modal-title">✍️ Write a Vlog</span>
+                <button id="writeVlogClose">✕</button>
+            </div>
+            <div id="writeVlogBody">
+                <div class="wv-field">
+                    <label class="wv-label">Your Name</label>
+                    <input type="text" id="wv-author" class="wv-input" placeholder="e.g. Riya C." maxlength="40">
+                </div>
+                <div class="wv-field">
+                    <label class="wv-label">Heritage Site</label>
+                    <input type="text" id="wv-site" class="wv-input" placeholder="e.g. Shore Temple, Mahabalipuram"
+                        maxlength="80">
+                </div>
+                <div class="wv-field">
+                    <label class="wv-label">Your Experience</label>
+                    <textarea id="wv-text" class="wv-input wv-textarea" placeholder="Share your visit experience..."
+                        maxlength="500"></textarea>
+                    <div class="wv-charcount"><span id="wv-count">0</span>/500</div>
+                </div>
+                <div class="wv-field">
+                    <label class="wv-label">Tags <span style="opacity:0.5">(comma separated)</span></label>
+                    <input type="text" id="wv-tags" class="wv-input" placeholder="e.g. Heritage, Tamil Nadu, Temple">
+                </div>
+                <div id="wv-error" class="wv-error"></div>
+                <button id="wv-submit" class="wv-submit-btn">💾 Save Vlog</button>
+                <div class="wv-firebase-note">
+                    🔥 <strong>Firebase ready:</strong> Your vlog is saved locally now.
+                    Connect Firebase to share with all visitors.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script src="dear.js"></script>
 </body>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<script>
-    // This code must be AFTER the leaflet.js script and AFTER the map div
-    var map = L.map('map').setView([20.5937, 78.9629], 5);
-
-    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-        maxZoom: 19,
-        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-    }).addTo(map);
-</script>
-<script src="dear.js"></script>
-</body>
-
 
 </html>
