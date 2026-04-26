@@ -15,7 +15,12 @@ body {
     position: static;
     color: black;
 }
-
+#header img {
+    height: 40px;
+    width: auto;
+    /* Keeps aspect ratio */
+    margin-right: 15px;
+}
 #header {
     border: 2px solid black;
     height: 8vh;
