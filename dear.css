@@ -37,13 +37,17 @@ body {
 }
 
 #sidebar {
+    text-align:center;
     border: 2px solid black;
     height: 83vh;
     width: 18vw;
     background-image: radial-gradient(circle, rgb(255, 140, 0), rgb(180, 172, 32));
     border-radius: 20px;
 }
+.number-of-sites{
+    text-align:center;
 
+}
 #eraselect {
 
     border-radius: 80px;
@@ -51,7 +55,42 @@ body {
     margin: 10px;
     text-align: center;
 }
+.era-jumps {
+    padding: 4px;
+    margin: 2px 4px;
+}
 
+.era-jumps-label {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #f4c060;
+    margin-bottom: 5px;
+    display: block;
+}
+.era-jump-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px;
+}
+.jump-btn {
+    padding: 6px 4px;
+    border: 1px solid rgba(0, 0, 0, 0.35);
+    border-radius: 8px;
+    background: rgba(255, 242, 0, 0.49);
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 9px;
+    cursor: pointer;
+    text-align: center;
+    transition: all .2s;
+    line-height: 1.4;
+}
+.jump-btn:hover {
+    background: rgba(244, 163, 64, .25);
+    border-color: #f4a340;
+    color: #f4c060;
+    transform: translateY(-1px);
+}
 #indiaarea {
     border: 2px solid black;
     height: 83vh;
