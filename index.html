@@ -10,30 +10,42 @@
 
 <body>
     <div id="header" style="display:flex">
-        <img src="/Indiadarshnam/images/image.png" height="40px" width:80px;>
+        <img src="/Indiadarshnam/images/image.png" height="40" width="80">
     </div>
-    <div id="middlearea">
 
+    <div id="middlearea">
         <div id="sidebar">
             <div id="eraselect">
-                <label for="erarange" style="  color:black;">Select Era:</label>
+                <label for="erarange" style="color:black;">Select Era:</label>
 
                 <input type="range" id="erarange" min="-2000" max="2026" value="2026" oninput="updateEra(this.value)">
-
                 <p id="eraprint"></p>
             </div>
+
             <div class="number-of-sites">
                 <div class="sites-count" id="siteCount">0</div>
                 <div class="sites-text">heritage sites<br>visible on map</div>
-        </div>
+            </div>
         </div>
 
-        <div id="indiaarea" style="  color:black;">
-            MainSection
+        <div id="indiaarea" style="color:black;">
+            <div id="map"></div>
         </div>
     </div>
-    <div id="footer">Footer</div>
 
+    <div id="footer">Footer</div>
+</body>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+    // This code must be AFTER the leaflet.js script and AFTER the map div
+    var map = L.map('map').setView([20.5937, 78.9629], 5);
+
+    L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+    }).addTo(map);
+</script>
 
 </body>
 <script src="dear.js"></script>
