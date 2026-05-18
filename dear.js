@@ -1,5 +1,38 @@
 console.log("BharatDarshnam loaded");
+//guys this is for firebase
+// Import Firebase tools
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, where } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
+// REPLACE THIS WITH YOUR ACTUAL KEYS FROM STEP 1
+const firebaseConfig = {
+  apiKey: "AIzaSyD_yk5-Zxft65M9m50xMFD9gVSEJjBIJJY",
+  authDomain: "bharatdasrshnam.firebaseapp.com",
+  projectId: "bharatdasrshnam",
+  storageBucket: "bharatdasrshnam.firebasestorage.app",
+  messagingSenderId: "51488619362",
+  appId: "1:51488619362:web:b73bdd05cb3dd1a649ca3b"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+console.log("Firebase Connected! 🔥");
+
+// Listen for Login/Logout state
+onAuthStateChanged(auth, (user) => {
+  const loginBtn = document.getElementById("loginBtn");
+  if (user) {
+    loginBtn.innerText = `👤 Logged in as ${user.email.split('@')[0]} (Click to Logout)`;
+    loginBtn.style.background = "#E8671A"; // Change to orange when logged in
+  } else {
+    loginBtn.innerText = "👤 Sign In / Sign Up";
+    loginBtn.style.background = "#2D6A4F";
+  }
+});
 /* ══════════════════════════════════════════════════════
    REAL TEMPLE / HERITAGE SITE DATA
    Sources: Wikipedia, ASI, UNESCO — founding years verified
