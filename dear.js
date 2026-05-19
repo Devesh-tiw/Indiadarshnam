@@ -26,11 +26,11 @@ console.log("Firebase Connected! 🔥");
 onAuthStateChanged(auth, (user) => {
   const loginBtn = document.getElementById("loginBtn");
   if (user) {
-    loginBtn.innerText = `👤 Logged in as ${user.email.split('@')[0]} (Click to Logout)`;
-    loginBtn.style.background = "#E8671A"; // Change to orange when logged in
+    loginBtn.innerText = ` Logged in as ${user.email.split('@')[0]} (Click to Logout)`;
+    loginBtn.style.background = "#58e81a"; // Change to orange when logged in
   } else {
     loginBtn.innerText = "👤 Sign In / Sign Up";
-    loginBtn.style.background = "#2D6A4F";
+    loginBtn.style.background = "#6a2d2d";
   }
 });
 /* ══════════════════════════════════════════════════════
@@ -437,20 +437,7 @@ const SITES = RAW_SITES.map(site => {
 /* ══════════════════════════════════════════════════════
    GLOBAL VLOGS
    ══════════════════════════════════════════════════════ */
-const GLOBAL_VLOGS = [
-  { author: "Riya C.", site: "All-India Yatra", date: "Apr 2024",
-    text: "Spent 6 months visiting 40 temples across India. Every state has its own architectural language — Kerala's sloping roofs, Tamil Nadu's towering gopurams, Odisha's beehive shikharas, Rajasthan's white marble. India is an entire civilisation wearing stone.",
-    tags: ["YatraAcrossIndia","60Temples","Heritage"] },
-  { author: "Tanmay P.", site: "Hoysala Circuit", date: "Mar 2024",
-    text: "Belur, Halebid, Somanathapura — three temples, three days, my brain permanently upgraded. Hoysala sculptors worked on soapstone so soft it could be scratched with a fingernail, yet the detail rivals Swiss watchmaking.",
-    tags: ["Hoysala","Karnataka","SculptureLovers"] },
-  { author: "Zara M.", site: "Rajasthan Temples", date: "Feb 2024",
-    text: "People forget Rajasthan has some of India's finest temples beyond forts. Ranakpur Jain Temple — 1,444 marble pillars, no two alike, zero load-bearing walls, 600 years old. It looks like a solidified dream.",
-    tags: ["Rajasthan","Jain","Ranakpur"] },
-  { author: "Shankar B.", site: "Char Dham Yatra", date: "Jun 2023",
-    text: "Kedarnath, Badrinath, Gangotri, Yamunotri — completed in 12 days. The helicopter view of Kedarnath Temple amid snow-capped Himalayas, standing alone in that ancient valley, reduced me to tears.",
-    tags: ["CharDham","Himalayas","Spiritual","Kedarnath"] }
-];
+const GLOBAL_VLOGS = [];
 
 /* ══════════════════════════════════════════════════════
    MAP INITIALISATION
@@ -507,15 +494,16 @@ SITES.forEach(site => {
 function updateEra(value) {
     let year = Number(value);
     let periodText = "";
-if      (year < -1999) {
-     document.getElementById("eraprint").style.visibility = "hidden";
-          document.getElementById("eraprint").style.display = "none";
-}
-else{
-      document.getElementById("eraprint").style.visibility = "visible";
-          document.getElementById("eraprint").style.display = "block";
-}
-    if      (year <= -1500) periodText = "Vedic Age";
+
+    // 1. Always make sure the text is visible!
+    document.getElementById("eraprint").style.visibility = "visible";
+    document.getElementById("eraprint").style.display = "block";
+
+    // 2. Added ancient timeline names!
+    if      (year <= -8000) periodText = "Satya Yuga / Puranic Era";
+    else if (year <= -4000) periodText = "Treta Yuga / Ramayana Era";
+    else if (year <= -3000) periodText = "Dvapara Yuga / Mahabharata Era";
+    else if (year <= -1500) periodText = "Vedic Age";
     else if (year <= -200)  periodText = "Classical Period";
     else if (year <= 600)   periodText = "Early Historic";
     else if (year <= 1200)  periodText = "Early Medieval";
@@ -524,11 +512,10 @@ else{
     else if (year <= 1947)  periodText = "Colonial Era";
     else                    periodText = "Post-Independence";
 
-    // Update display
-    
-    document.getElementById("era-number").textContent = (year);
+    // Update display (Use Math.abs so it says "10000 BCE" instead of "-10000 BCE")
+    document.getElementById("era-number").textContent = Math.abs(year);
     document.getElementById("era-bce-ce").textContent = year < 0 ? "BCE" : "CE";
-    document.getElementById("eraprint").textContent    = periodText;
+    document.getElementById("eraprint").textContent   = periodText;
 
     const slider = document.getElementById("erarange");
     const min = parseInt(slider.min), max = parseInt(slider.max);
@@ -539,6 +526,8 @@ else{
     let count = 0;
     const listEl = document.getElementById("siteList");
     listEl.innerHTML = "";
+
+    // ... (Keep the rest of the function EXACTLY the same below this line!) ...
 
     SITES.forEach(site => {
         const visible = site.era <= year;
@@ -776,12 +765,13 @@ document.getElementById("vlogBtn").addEventListener("click", () => {
     // Fetch from the 'vlogs' collection, ordered by newest first
     const q = query(collection(db, "vlogs"), orderBy("timestamp", "desc"));
     
-    onSnapshot(q, (snapshot) => {
-        const firebaseVlogs = [];
-        snapshot.forEach((doc) => {
-            firebaseVlogs.push(doc.data());
-        });
-
+onSnapshot(q, (snapshot) => {
+            const firebaseVlogs = [];
+            snapshot.forEach((doc) => {
+                const data = doc.data(); // Grab the text data
+                data.id = doc.id;        // Grab the unique Firebase ID!
+                firebaseVlogs.push(data);
+            });
         // Combine the live Firebase vlogs with your hardcoded GLOBAL_VLOGS
         const allVlogs = [...firebaseVlogs, ...GLOBAL_VLOGS];
         
