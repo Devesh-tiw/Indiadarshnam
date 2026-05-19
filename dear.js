@@ -2,7 +2,7 @@ console.log("BharatDarshnam loaded");
 //guys this is for firebase
 // Import Firebase tools
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
-import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 // REPLACE THIS WITH YOUR ACTUAL KEYS FROM STEP 1
@@ -740,14 +740,15 @@ document.getElementById("wv-submit").addEventListener("click", async () => {
     const date = now.toLocaleString("en-IN", { month: "short", year: "numeric" });
 
     try {
-        // 🔥 Send the data to Firebase Firestore!
+    // 🔥 Send the data to Firebase Firestore!
         await addDoc(collection(db, "vlogs"), {
             author: author,
             site: site,
             text: text,
             tags: tags,
             date: date,
-            timestamp: Date.now() // We use this to put the newest vlogs at the top
+            timestamp: Date.now(),
+            likes: 0 // <-- ADD THIS LINE!
         });
 
         closeWriteVlogModal();
@@ -832,4 +833,37 @@ document.getElementById("signInBtn").addEventListener("click", () => {
             loginModal.style.display = "none";
         })
         .catch((error) => showToast("Wrong email or password!"));
+});
+/* ── HANDLE LIKES IN REAL-TIME ──────────────────── */
+document.getElementById("modalBody").addEventListener("click", async (e) => {
+    // Check if the user clicked a "like-btn"
+    if (e.target.classList.contains("like-btn")) {
+        
+        // Stop users who aren't signed in from liking
+        if (!auth.currentUser) {
+            showToast("⚠️ Please Sign In to like this blog!");
+            document.getElementById("loginModal").style.display = "flex";
+            return;
+        }
+
+        const blogId = e.target.getAttribute("data-id");
+        
+        // If it's one of your hardcoded GLOBAL_VLOGS, it won't have a Firebase ID yet
+        if (!blogId || blogId === "undefined") {
+            showToast("This is a legacy post and cannot be liked!");
+            return;
+        }
+
+        try {
+            // Tell Firebase to add +1 to the likes!
+            const blogRef = doc(db, "vlogs", blogId);
+            await updateDoc(blogRef, {
+                likes: increment(1)
+            });
+            // You don't even need to refresh the page! onSnapshot will instantly update the number.
+        } catch (error) {
+            console.error("Error liking blog:", error);
+            showToast("⚠️ Error: Could not like post.");
+        }
+    }
 });
