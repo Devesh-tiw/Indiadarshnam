@@ -783,3 +783,53 @@ document.getElementById("vlogBtn").addEventListener("click", () => {
     const allVlogs  = [...userVlogs, ...GLOBAL_VLOGS];
     openModal("📖 Community Vlogs", renderVlogs(allVlogs));
 }, true); // 'true' = capture phase, runs before the original listener
+/* ══════════════════════════════════════════════════════
+   LOGIN MODAL & FIREBASE AUTH LOGIC
+   ══════════════════════════════════════════════════════ */
+const loginModal = document.getElementById("loginModal");
+const closeLoginModal = document.getElementById("closeLoginModal");
+
+// Fix for Module Scoping (Keeps your slider working!)
+window.updateEra = updateEra;
+
+// Open Modal
+document.getElementById("loginBtn").addEventListener("click", () => {
+    if (auth.currentUser) {
+        // If logged in, log out!
+        signOut(auth).then(() => showToast("Logged out successfully!"));
+    } else {
+        // Open the box
+        loginModal.style.display = "flex";
+    }
+});
+
+// Close Modal
+closeLoginModal.addEventListener("click", () => {
+    loginModal.style.display = "none";
+});
+
+// Sign UP
+document.getElementById("signUpBtn").addEventListener("click", () => {
+    const email = document.getElementById("emailInput").value;
+    const pass = document.getElementById("passwordInput").value;
+    
+    createUserWithEmailAndPassword(auth, email, pass)
+        .then((userCred) => {
+            showToast("Account Created!");
+            loginModal.style.display = "none";
+        })
+        .catch((error) => showToast(error.message.replace("Firebase: ", "")));
+});
+
+// Sign IN
+document.getElementById("signInBtn").addEventListener("click", () => {
+    const email = document.getElementById("emailInput").value;
+    const pass = document.getElementById("passwordInput").value;
+    
+    signInWithEmailAndPassword(auth, email, pass)
+        .then((userCred) => {
+            showToast("Signed In Successfully!");
+            loginModal.style.display = "none";
+        })
+        .catch((error) => showToast("Wrong email or password!"));
+});

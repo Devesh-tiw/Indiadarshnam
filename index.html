@@ -84,7 +84,25 @@
             <div id="modalBody"></div>
         </div>
     </div>
+<div id="loginModal" class="modal-box"
+    style="display: none; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); z-index: 9999; align-items: center; justify-content: center;">
+    <div
+        style="background: #1a1a2e; padding: 20px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.2); width: 300px; position: relative;">
+        <button id="closeLoginModal"
+            style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: white; cursor: pointer;">✕</button>
+        <h2 style="color: #f4a340; margin-bottom: 15px;">Sign In / Sign Up</h2>
 
+        <input type="email" id="emailInput" class="wv-input" placeholder="Email Address" style="margin-bottom: 10px;">
+        <input type="password" id="passwordInput" class="wv-input" placeholder="Password (min 6 chars)"
+            style="margin-bottom: 15px;">
+
+        <div style="display: flex; gap: 10px;">
+            <button id="signInBtn" class="wv-submit-btn" style="flex: 1; padding: 10px;">Sign In</button>
+            <button id="signUpBtn" class="wv-submit-btn"
+                style="flex: 1; padding: 10px; background: #2D6A4F; color: white;">Sign Up</button>
+        </div>
+    </div>
+</div>
     <!-- Toast -->
     <div id="toast"></div>
 
@@ -126,7 +144,7 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <script src="dear.js"></script>
+  
 </body>
 
 </html>
