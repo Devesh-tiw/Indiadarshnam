@@ -687,45 +687,29 @@ function loadUserVlogs() {
     return JSON.parse(localStorage.getItem("bharatdarshnam_vlogs") || "[]");
 }
 
-/* ── FIREBASE STUBS (uncomment when ready) ──────────
-import { initializeApp } from "firebase/app";
-import { getFirestore, collection, addDoc, getDocs, orderBy, query } from "firebase/firestore";
-
-const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT.firebaseapp.com",
-    projectId: "YOUR_PROJECT_ID",
-};
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
-
-async function saveVlogToFirebase(vlog) {
-    await addDoc(collection(db, "vlogs"), vlog);
-}
-
-async function loadVlogsFromFirebase() {
-    const q = query(collection(db, "vlogs"), orderBy("date", "desc"));
-    const snap = await getDocs(q);
-    return snap.docs.map(d => d.data());
-}
-── END FIREBASE STUBS ─────────────────────────────── */
+/* ══════════════════════════════════════════════════════
+   WRITE A VLOG — FIREBASE REAL-TIME DATABASE
+   ══════════════════════════════════════════════════════ */
 
 /* ── OPEN / CLOSE WRITE VLOG MODAL ─────────────── */
 document.getElementById("writeVlogBtn").addEventListener("click", () => {
+    // Check if user is logged in before letting them write!
+    if (!auth.currentUser) {
+        showToast("⚠️ Please Sign In to write a vlog!");
+        // Auto-open the login modal for them
+        document.getElementById("loginModal").style.display = "flex";
+        return;
+    }
+    
     document.getElementById("writeVlogModal").classList.add("open");
+    // Auto-fill their email as the author
+    document.getElementById("wv-author").value = auth.currentUser.email.split('@')[0];
 });
 
-document.getElementById("writeVlogClose").addEventListener("click", () => {
-    closeWriteVlogModal();
-});
-
-document.getElementById("writeVlogModal").addEventListener("click", e => {
-    if (e.target === document.getElementById("writeVlogModal")) closeWriteVlogModal();
-});
+document.getElementById("writeVlogClose").addEventListener("click", closeWriteVlogModal);
 
 function closeWriteVlogModal() {
     document.getElementById("writeVlogModal").classList.remove("open");
-    document.getElementById("wv-author").value = "";
     document.getElementById("wv-site").value   = "";
     document.getElementById("wv-text").value   = "";
     document.getElementById("wv-tags").value   = "";
@@ -738,8 +722,8 @@ document.getElementById("wv-text").addEventListener("input", function () {
     document.getElementById("wv-count").textContent = this.value.length;
 });
 
-/* ── SUBMIT VLOG ────────────────────────────────── */
-document.getElementById("wv-submit").addEventListener("click", () => {
+/* ── SUBMIT VLOG TO FIREBASE ────────────────────── */
+document.getElementById("wv-submit").addEventListener("click", async () => {
     const author = document.getElementById("wv-author").value.trim();
     const site   = document.getElementById("wv-site").value.trim();
     const text   = document.getElementById("wv-text").value.trim();
@@ -750,39 +734,56 @@ document.getElementById("wv-submit").addEventListener("click", () => {
     if (!author) { errEl.textContent = "⚠️ Please enter your name."; return; }
     if (!site)   { errEl.textContent = "⚠️ Please enter the heritage site name."; return; }
     if (text.length < 20) { errEl.textContent = "⚠️ Please write at least 20 characters."; return; }
-    errEl.textContent = "";
+    errEl.textContent = "Saving to database...";
 
-    const tags = tagsRaw
-        ? tagsRaw.split(",").map(t => t.trim()).filter(Boolean)
-        : ["Heritage"];
-
+    const tags = tagsRaw ? tagsRaw.split(",").map(t => t.trim()).filter(Boolean) : ["Heritage"];
     const now  = new Date();
     const date = now.toLocaleString("en-IN", { month: "short", year: "numeric" });
 
-    const vlog = { author, site, text, tags, date };
+    try {
+        // 🔥 Send the data to Firebase Firestore!
+        await addDoc(collection(db, "vlogs"), {
+            author: author,
+            site: site,
+            text: text,
+            tags: tags,
+            date: date,
+            timestamp: Date.now() // We use this to put the newest vlogs at the top
+        });
 
-    // ── Save (swap this line for saveVlogToFirebase(vlog) when using Firebase)
-    saveVlogLocally(vlog);
+        closeWriteVlogModal();
+        showToast("✅ Vlog published to the community!");
 
-    // Show success
-    closeWriteVlogModal();
-    showToast("✅ Vlog saved successfully!");
-
-    // Refresh the community vlogs view if it's open
-    const modal = document.getElementById("vlogModal");
-    if (modal.classList.contains("open")) {
-        const allVlogs = [...loadUserVlogs(), ...GLOBAL_VLOGS];
-        document.getElementById("modalBody").innerHTML = renderVlogs(allVlogs);
+    } catch (error) {
+        errEl.textContent = "⚠️ Error saving: " + error.message;
     }
 });
 
-/* ── PATCH vlogBtn TO SHOW USER VLOGS TOO ───────── */
-// Override the original vlogBtn listener to merge saved + global vlogs
+/* ── FETCH VLOGS FROM FIREBASE REAL-TIME ────────── */
+// We use onSnapshot so the list updates instantly if someone else posts!
 document.getElementById("vlogBtn").addEventListener("click", () => {
-    const userVlogs = loadUserVlogs();
-    const allVlogs  = [...userVlogs, ...GLOBAL_VLOGS];
-    openModal("📖 Community Vlogs", renderVlogs(allVlogs));
-}, true); // 'true' = capture phase, runs before the original listener
+    // Show a loading message first
+    openModal("📖 Community Vlogs", "<div style='padding: 20px; text-align: center; color: #f4a340;'>Fetching real-time vlogs from database...</div>");
+
+    // Fetch from the 'vlogs' collection, ordered by newest first
+    const q = query(collection(db, "vlogs"), orderBy("timestamp", "desc"));
+    
+    onSnapshot(q, (snapshot) => {
+        const firebaseVlogs = [];
+        snapshot.forEach((doc) => {
+            firebaseVlogs.push(doc.data());
+        });
+
+        // Combine the live Firebase vlogs with your hardcoded GLOBAL_VLOGS
+        const allVlogs = [...firebaseVlogs, ...GLOBAL_VLOGS];
+        
+        // Inject them into the modal!
+        const modal = document.getElementById("vlogModal");
+        if (modal.classList.contains("open")) {
+            document.getElementById("modalBody").innerHTML = renderVlogs(allVlogs);
+        }
+    });
+});
 /* ══════════════════════════════════════════════════════
    LOGIN MODAL & FIREBASE AUTH LOGIC
    ══════════════════════════════════════════════════════ */
