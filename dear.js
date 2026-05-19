@@ -607,16 +607,24 @@ window.showSiteVlogs = function(id) {
 /* ══════════════════════════════════════════════════════
    MODAL
    ══════════════════════════════════════════════════════ */
-function renderVlogs(vlogs) {
-    return vlogs.map(v => `
-        <div class="vlog-card">
-          <div class="vlog-meta">
-            <div class="vlog-avatar">${v.author[0]}</div>
-            <div><div class="vlog-author">${v.author}</div><div class="vlog-date">${v.date}</div></div>
-          </div>
-          <div class="vlog-text">"${v.text}"</div>
-          <div class="vlog-tags">${v.tags.map(t=>`<span class="vlog-tag">${t}</span>`).join('')}</div>
-        </div>`).join('');
+function renderVlogs(vlogsArray) {
+    if (vlogsArray.length === 0) return "<p>No community blogs yet. Be the first to write one!</p>";
+
+    return vlogsArray.map(vlog => `
+        <div style="background: #2a2a3e; padding: 15px; border-radius: 10px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1);">
+            <h3 style="color: #f4a340; margin-top: 0; margin-bottom: 5px;">${vlog.site}</h3>
+            <p style="font-size: 12px; color: #aaa; margin-bottom: 10px;">By <strong>${vlog.author}</strong> • ${vlog.date}</p>
+            <p style="line-height: 1.5;">${vlog.text}</p>
+            
+            <div style="margin-top: 15px; display: flex; align-items: center; gap: 10px;">
+                <button class="like-btn" data-id="${vlog.id}" style="background: transparent; border: 1px solid #f4a340; color: #f4a340; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s;">
+                    ❤️ Like
+                </button>
+                <span style="color: #ccc; font-size: 14px;">${vlog.likes || 0} Likes</span>
+            </div>
+            
+        </div>
+    `).join("");
 }
 
 function openModal(title, bodyHtml) {
