@@ -1,9 +1,9 @@
 console.log("BharatDarshnam loaded");
-//guys this is for firebase
+
 // Import Firebase tools
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
+import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
-import { getFirestore, collection, addDoc, onSnapshot, query, where, orderBy } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
 // REPLACE THIS WITH YOUR ACTUAL KEYS FROM STEP 1
 const firebaseConfig = {
@@ -615,14 +615,14 @@ function renderVlogs(vlogsArray) {
             <h3 style="color: #f4a340; margin-top: 0; margin-bottom: 5px;">${vlog.site}</h3>
             <p style="font-size: 12px; color: #aaa; margin-bottom: 10px;">By <strong>${vlog.author}</strong> • ${vlog.date}</p>
             <p style="line-height: 1.5;">${vlog.text}</p>
-            
+
             <div style="margin-top: 15px; display: flex; align-items: center; gap: 10px;">
                 <button class="like-btn" data-id="${vlog.id}" style="background: transparent; border: 1px solid #f4a340; color: #f4a340; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s;">
                     ❤️ Like
                 </button>
                 <span style="color: #ccc; font-size: 14px;">${vlog.likes || 0} Likes</span>
             </div>
-            
+
         </div>
     `).join("");
 }
