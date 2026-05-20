@@ -449,10 +449,10 @@ const map = L.map('map', {
   scrollWheelZoom: true,
 });
 
-// Dark tile layer (Stadia Alidade Smooth Dark)
-L.tileLayer('https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png', {
-  attribution: '&copy; Stadia Maps, &copy; OpenMapTiles, &copy; OpenStreetMap',
-  maxZoom: 20,
+// Dark tile layer (CartoDB Dark Matter - Free & No Auth Required!)
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+    maxZoom: 20
 }).addTo(map);
 
 /* ── MARKER CREATION ─────────────────────────────── */
