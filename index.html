@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bharat Darshnam</title>
+    <link rel="stylesheet" href="dear.css">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<script type="module" src="dear.js"></script>
+<body>
+    <div id="header" style="display:flex; align-items:center; gap:12px;">
+        <img src="/Indiadarshnam/images/image.png" height="40" width="80">
+        
+        <button id="writeVlogBtn"> Write a Blog</button>
+    <div class="footer-btn" style="display:flex">
+        <button id="vlogBtn"> Community Vlogs</button>
+        <button id="loginBtn"
+            style="width: 100%; padding: 12px;margin-left: 800px; background: #2D6A4F; color: white; border: none; border-radius: 6px; 
+            font-weight: bold; cursor: pointer; margin-bottom: 10px;">
+            Sign In / Sign Up</button>
+          
+    </div>
+    </div>
+
+    <div id="middlearea">
+        <div id="sidebar">
+
+            <!-- Era Slider -->
+            <div id="eraselect">
+                <div style="display:flex; gap:6px; align-items: center;">
+                    <div id="era-number"></div>
+                    <div id="era-bce-ce"></div>
+                </div>
+            </div>
+
+            <!-- Site Count -->
+            <div class="number-of-sites">
+                <div class="sites-count" id="siteCount">0</div>
+                <div class="sites-text">heritage sites<br>visible on map</div>
+            </div>
+
+            <!-- Era Jump Buttons -->
+    <div id="eraselect">
+        <div style="display:flex; gap:6px; align-items: center; justify-content: center;">
+            <div id="era-number"></div>
+            <div id="era-bce-ce"></div>
+        </div>
+        <input type="range" id="erarange" min="-10000" max="2026" value="-10000" oninput="updateEra(this.value)">
+        <p id="eraprint" style="visibility: visible; color: black; font-weight: bold;"></p>
+    </div>
+    
+    <div class="era-jumps">
+        <p style="color:black; font-weight: bold;">Jump to Era</p>
+        <div class="era-jump-grid">
+            <button class="jump-btn" data-year="-10000">Puranic Era<br>10,000 BCE</button>
+            <button class="jump-btn" data-year="-5000">Epic Era<br>5,000 BCE</button>
+            <button class="jump-btn" data-year="-2000">Vedic Age<br>2000 BCE</button>
+            <button class="jump-btn" data-year="-200">Classical<br>200 BCE</button>
+            <button class="jump-btn" data-year="600">Early Historic<br>600 CE</button>
+            <button class="jump-btn" data-year="1000">Early Medieval<br>1000 CE</button>
+            <button class="jump-btn" data-year="1500">Late Medieval<br>1500 CE</button>
+            <button class="jump-btn" data-year="2026">Present Day<br>2026 CE</button>
+        </div>
+    </div>
+
+            <!-- Site List -->
+            <div class="site-list-section">
+                <span class="site-list-label" style="color:black">Heritage Sites</span>
+                <div id="siteList"></div>
+            </div>
+
+        </div>
+
+        <div id="indiaarea" style="color:black;">
+            <div id="map"></div>
+        </div>
+    </div>
+
+<div id="footer"
+    style="display: flex; justify-content: space-between; align-items: center; padding: 0 30px; box-sizing: border-box;">
+
+    <div style="font-size: 14px; font-weight: bold; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+        🏛️ Bharat Darshnam
+    </div>
+
+    <div style="font-size: 12px; color: rgba(255,255,255,0.9); text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
+        Built with love for history lovers. © 2026 All rights reserved.
+    </div>
+
+    <div style="font-size: 12px; display: flex; gap: 15px;">
+        <a href="#"
+            style="color: white; text-decoration: none; font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">About</a>
+        <a href="#"
+            style="color: white; text-decoration: none; font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Contact</a>
+        <a href="#"
+            style="color: white; text-decoration: none; font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Privacy</a>
+    </div>
+
+</div>
+
+    <!-- Modal -->
+    <div id="vlogModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span class="modal-title"></span>
+                <button id="modalClose">✕</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+<div id="loginModal" class="modal-box"
+    style="display: none;margin-left:35%; position: fixed; inset: 0; background: rgba(0, 0, 0, 0.65); z-index: 9999; align-items: center; justify-content: center;">
+    <div
+        style="background: #1a1a2e; padding: 20px; border-radius: 16px; border: 1px solid rgba(255, 255, 255, 0.2); width: 300px; position: relative;">
+        <button id="closeLoginModal"
+            style="position: absolute; top: 15px; right: 15px; background: transparent; border: none; color: rgb(255, 0, 0); cursor: pointer;">✕</button>
+        <h2 style="color: #f4a340; margin-bottom: 15px;">Sign In / Sign Up</h2>
+        <input type="email" id="emailInput" class="wv-input" placeholder="Email Address" style="margin-bottom: 10px;">
+        <input type="password" id="passwordInput" class="wv-input" placeholder="Password (min 6 chars)"
+            style="margin-bottom: 15px;">
+
+        <div style="display: flex; gap: 10px;">
+            <button id="signInBtn" class="wv-submit-btn" style="flex: 1; padding: 10px;">Sign In</button>
+            <button id="signUpBtn" class="wv-submit-btn"
+                style="flex: 1; padding: 10px; background: #2D6A4F; color: white;">Sign Up</button>
+        </div>
+    </div>
+</div>
+    <!-- Toast -->
+    <div id="toast"></div>
+
+    <!-- Write Vlog Modal -->
+    <div id="writeVlogModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <span class="modal-title"> Write a Vlog</span>
+                <button id="writeVlogClose">✕</button>
+            </div>
+            <div id="writeVlogBody">
+                <div class="wv-field">
+                    <label class="wv-label">Your Name</label>
+                    <input type="text" id="wv-author" class="wv-input" placeholder="e.g. Riya C." maxlength="40">
+                </div>
+                <div class="wv-field">
+                    <label class="wv-label">Heritage Site</label>
+                    <input type="text" id="wv-site" class="wv-input" placeholder="e.g. Shore Temple, Mahabalipuram"
+                        maxlength="80">
+                </div>
+                <div class="wv-field">
+                    <label class="wv-label">Your Experience</label>
+                    <textarea id="wv-text" class="wv-input wv-textarea" placeholder="Share your visit experience..."
+                        maxlength="500"></textarea>
+                    <div class="wv-charcount"><span id="wv-count">0</span>/500</div>
+                </div>
+                <div class="wv-field">
+                    <label class="wv-label">Tags <span style="opacity:0.5">(comma separated)</span></label>
+                    <input type="text" id="wv-tags" class="wv-input" placeholder="e.g. Heritage, Tamil Nadu, Temple">
+                </div>
+                <div id="wv-error" class="wv-error"></div>
+                <button id="wv-submit" class="wv-submit-btn"> Save Vlog</button>
+                <div class="wv-firebase-note">
+                     <strong>Firebase ready:</strong> Your vlog is saved locally now.
+                    Connect Firebase to share with all visitors.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  
+</body>
+
+</html>
