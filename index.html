@@ -7,6 +7,47 @@
     <title>Bharat Darshnam</title>
     <link rel="stylesheet" href="dear.css">
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+
+    
+    <style>
+      
+
+#sidebar {
+    width: 250px;
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-right: 1px solid #ddd;
+    display: flex;
+    flex-direction: column;
+    gap: 15px; /* Adds space between inputs and labels */
+}
+
+#indiaarea {
+    flex-grow: 1; /* Makes the map fill the rest of the screen */
+    position: relative;
+    display: flex;
+}
+#header {
+    display: flex;
+    align-items: center; /* Vertically centers the logo and text */
+    background-color: #97db72; /* Or keep it dark, but change text color */
+    padding: 10px 20px;
+    border-bottom: 1px solid #ddd;
+    color: #abca4f; /* Dark text for a light background */
+}
+
+#header img {
+    height: 40px;
+    width: auto; /* Keeps aspect ratio */
+    margin-right: 15px;
+}
+#map{
+    height: 100%;
+    width: 100%;
+}
+div{display: inline-block;}
+    </style>
+
 </head>
 <script type="module" src="dear.js"></script>
 
@@ -23,6 +64,30 @@
 
         </div>
     </div>
+
+
+    
+   
+    <div id="sidebar">
+      <div id="eraselect">
+     <label for="erarange" style="  color:black;">Select Era:</label>
+    
+    <input type="range" id="erarange" min="-2000" max="2026" value="2026" oninput="updateEra(this.value)">
+    
+    <p id="eraprint"></p>
+</div>
+<div class="number-of-sites">
+  <div class="sites-count" id="siteCount">0</div>
+  <div class="sites-text">heritage sites<br>visible on map</div>
+</div>
+    </div>
+
+
+
+
+    <div id="indiaarea" style="  color:black;">
+MainSection
+     <div id="map"></div> 
 
     <div id="middlearea">
         <div id="sidebar">
@@ -77,10 +142,11 @@
         <div id="indiaarea" style="color:black;">
             <div id="map"></div>
         </div>
+>>>>>>> a4ff936825bf5b5e4fe887ddfe84e381a6d17631
     </div>
 
-    <div id="footer"
-        style="display: flex; justify-content: space-between; align-items: center; padding: 0 30px; box-sizing: border-box;">
+<div id="footer"
+    style="display: flex; justify-content: space-between; align-items: center; padding: 0 30px; box-sizing: border-box;">
 
         <div style="font-size: 14px; font-weight: bold; color: white; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">
             🏛️ Bharat Darshnam
@@ -99,7 +165,7 @@
                 style="color: white; text-decoration: none; font-weight: 600; text-shadow: 1px 1px 2px rgba(0,0,0,0.5);">Privacy</a>
         </div>
 
-    </div>
+</div>
 
     <!-- Modal -->
     <div id="vlogModal">
@@ -171,7 +237,7 @@
     </div>
 
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
+  
 </body>
 
 </html>
