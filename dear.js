@@ -390,10 +390,10 @@ const SITES = RAW_SITES.map(site => {
     let siteType = "Temple";
     
     if (site.title.toLowerCase().includes("cave")) {
-        siteColor = "#2D6A4F"; // Green for caves
+        siteColor = "#2D6A4F"; 
         siteType = "Cave Temple";
     } else if (site.title.toLowerCase().includes("math") || site.title.toLowerCase().includes("stupa")) {
-        siteColor = "#f4a340"; // Yellow for monuments/maths
+        siteColor = "#f4a340";
         siteType = "Monument";
     }
 
