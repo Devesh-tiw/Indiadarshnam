@@ -467,8 +467,6 @@ SITES.forEach(site => {
 function updateEra(value) {
     let year = Number(value);
     let periodText = "";
-
-    // 1. Always make sure the text is visible!
     document.getElementById("eraprint").style.visibility = "visible";
     document.getElementById("eraprint").style.display = "block";
 
@@ -495,7 +493,6 @@ function updateEra(value) {
     const pct = ((year - min) / (max - min) * 100).toFixed(1);
     slider.style.background = `linear-gradient(90deg, #b04a08 0%, #f4a340 ${pct}%, rgba(255,255,255,0.15) ${pct}%)`;
 
-    // Show/hide markers and update site list
     let count = 0;
     const listEl = document.getElementById("siteList");
     listEl.innerHTML = "";
@@ -532,10 +529,10 @@ window.showHistory = function(id) {
     const site = SITES.find(s => s.id === id);
     if (!site) return;
     openModal(
-        `📜 ${site.title}`,
+        ` ${site.title}`,
         `<div style="color:rgba(255,255,255,.7);font-size:13px;line-height:1.8;font-style:italic;margin-bottom:14px">${site.history}</div>
          <div style="padding:10px 12px;border-radius:8px;background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.3);font-size:11px;color:#c89040">
-           📚 In the full app, this connects to the Wikipedia API for full articles, scholarly sources, and photo galleries.
+            In the full app, this connects to the Wikipedia API for full articles, scholarly sources, and photo galleries.
          </div>`
     );
 };
@@ -543,7 +540,7 @@ window.showHistory = function(id) {
 window.planTrip = function(name, state) {
     const hotels = [`${state} Heritage Haveli ★★★★★`, `The Palace Grand, ${state} ★★★★`, `Backpacker Dharamshala ★★★`, `Eco-Stay & Retreat ★★★★`];
     openModal(
-        `🏨 Plan Trip to ${name}`,
+        ` Plan Trip to ${name}`,
         `<p style="color:rgba(255,255,255,.6);font-size:12px;margin-bottom:14px">Mock hotel listings near <strong style="color:#f4a340">${name}</strong>, ${state}</p>
          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
            ${hotels.map(h => `<div style="padding:11px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);cursor:pointer" onmouseover="this.style.borderColor='rgba(244,163,64,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,.1)'">
@@ -551,7 +548,7 @@ window.planTrip = function(name, state) {
              <div style="font-size:10px;color:#8a6030">Mock price · Book now</div></div>`).join('')}
          </div>
          <div style="padding:9px 12px;border-radius:8px;background:rgba(45,106,79,.1);border:1px solid rgba(45,106,79,.3);font-size:11px;color:#6fcf97">
-           🏨 Live version integrates MakeMyTrip, Booking.com, and local homestay APIs.
+            Live version integrates MakeMyTrip, Booking.com, and local homestay APIs.
          </div>`
     );
 };
@@ -559,7 +556,7 @@ window.planTrip = function(name, state) {
 window.showSiteVlogs = function(id) {
     const site = SITES.find(s => s.id === id);
     if (!site) return;
-    openModal(`📖 Vlogs — ${site.title}`, renderVlogs(site.vlogs));
+    openModal(`Vlogs — ${site.title}`, renderVlogs(site.vlogs));
 };
 
 function renderVlogs(vlogsArray) {
@@ -573,7 +570,7 @@ function renderVlogs(vlogsArray) {
 
             <div style="margin-top: 15px; display: flex; align-items: center; gap: 10px;">
                 <button class="like-btn" data-id="${vlog.id}" style="background: transparent; border: 1px solid #f4a340; color: #f4a340; padding: 5px 12px; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.2s;">
-                    ❤️ Like
+                     Like
                 </button>
                 <span style="color: #ccc; font-size: 14px;">${vlog.likes || 0} Likes</span>
             </div>
@@ -598,7 +595,7 @@ document.getElementById("vlogModal").addEventListener("click", e => {
 });
 
 document.getElementById("vlogBtn").addEventListener("click", () => {
-    openModal("📖 Community Vlogs", renderVlogs(GLOBAL_VLOGS));
+    openModal(" Community Vlogs", renderVlogs(GLOBAL_VLOGS));
 });
 
 let toastTimer;
@@ -621,7 +618,6 @@ document.querySelectorAll(".jump-btn").forEach(btn => {
     });
 });
 
-/* ── INITIAL RENDER ─────────────────────────────── */
 updateEra(document.getElementById("erarange").value);
 
 function saveVlogLocally(vlog) {
@@ -636,16 +632,16 @@ function loadUserVlogs() {
 
 
 document.getElementById("writeVlogBtn").addEventListener("click", () => {
-    // Check if user is logged in before letting them write!
+   
     if (!auth.currentUser) {
-        showToast("⚠️ Please Sign In to write a vlog!");
+        showToast(" Please Sign In to write a vlog!");
       
         document.getElementById("loginModal").style.display = "flex";
         return;
     }
     
     document.getElementById("writeVlogModal").classList.add("open");
-    // Auto-fill their email as the author
+    
     document.getElementById("wv-author").value = auth.currentUser.email.split('@')[0];
 });
 
@@ -672,9 +668,9 @@ document.getElementById("wv-submit").addEventListener("click", async () => {
     const errEl  = document.getElementById("wv-error");
 
     // Validation
-    if (!author) { errEl.textContent = "⚠️ Please enter your name."; return; }
-    if (!site)   { errEl.textContent = "⚠️ Please enter the heritage site name."; return; }
-    if (text.length < 20) { errEl.textContent = "⚠️ Please write at least 20 characters."; return; }
+    if (!author) { errEl.textContent = " Please enter your name."; return; }
+    if (!site)   { errEl.textContent = " Please enter the heritage site name."; return; }
+    if (text.length < 20) { errEl.textContent = " Please write at least 20 characters."; return; }
     errEl.textContent = "Saving to database...";
 
     const tags = tagsRaw ? tagsRaw.split(",").map(t => t.trim()).filter(Boolean) : ["Heritage"];
@@ -694,17 +690,17 @@ document.getElementById("wv-submit").addEventListener("click", async () => {
         });
 
         closeWriteVlogModal();
-        showToast("✅ Vlog published to the community!");
+        showToast(" Vlog published to the community!");
 
     } catch (error) {
-        errEl.textContent = "⚠️ Error saving: " + error.message;
+        errEl.textContent = " Error saving: " + error.message;
     }
 });
 
 
 document.getElementById("vlogBtn").addEventListener("click", () => {
     // Show a loading message first
-    openModal("📖 Community Vlogs", "<div style='padding: 20px; text-align: center; color: #f4a340;'>Fetching real-time vlogs from database...</div>");
+    openModal(" Community Vlogs", "<div style='padding: 20px; text-align: center; color: #f4a340;'>Fetching real-time vlogs from database...</div>");
 
     const q = query(collection(db, "vlogs"), orderBy("timestamp", "desc"));
     
@@ -741,12 +737,10 @@ document.getElementById("loginBtn").addEventListener("click", () => {
     }
 });
 
-// Close Modal
 closeLoginModal.addEventListener("click", () => {
     loginModal.style.display = "none";
 });
 
-// Sign UP
 document.getElementById("signUpBtn").addEventListener("click", () => {
     const email = document.getElementById("emailInput").value;
     const pass = document.getElementById("passwordInput").value;
@@ -759,7 +753,6 @@ document.getElementById("signUpBtn").addEventListener("click", () => {
         .catch((error) => showToast(error.message.replace("Firebase: ", "")));
 });
 
-// Sign IN
 document.getElementById("signInBtn").addEventListener("click", () => {
     const email = document.getElementById("emailInput").value;
     const pass = document.getElementById("passwordInput").value;
@@ -777,7 +770,7 @@ document.getElementById("modalBody").addEventListener("click", async (e) => {
     if (e.target.classList.contains("like-btn")) {
         
         if (!auth.currentUser) {
-            showToast("⚠️ Please Sign In to like this blog!");
+            showToast(" Please Sign In to like this blog!");
             document.getElementById("loginModal").style.display = "flex";
             return;
         }
@@ -798,7 +791,7 @@ document.getElementById("modalBody").addEventListener("click", async (e) => {
         
         } catch (error) {
             console.error("Error liking blog:", error);
-            showToast("⚠️ Error: Could not like post.");
+            showToast(" Error: Could not like post.");
         }
     }
 });
