@@ -5,7 +5,6 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebas
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
 
-// REPLACE THIS WITH YOUR ACTUAL KEYS FROM STEP 1
 const firebaseConfig = {
   apiKey: "AIzaSyD_yk5-Zxft65M9m50xMFD9gVSEJjBIJJY",
   authDomain: "bharatdasrshnam.firebaseapp.com",
@@ -27,22 +26,13 @@ onAuthStateChanged(auth, (user) => {
   const loginBtn = document.getElementById("loginBtn");
   if (user) {
     loginBtn.innerText = ` Logged in as ${user.email.split('@')[0]} (Click to Logout)`;
-    loginBtn.style.background = "#58e81a"; // Change to orange when logged in
+    loginBtn.style.background = "#58e81a";
   } else {
     loginBtn.innerText = "👤 Sign In / Sign Up";
     loginBtn.style.background = "#6a2d2d";
   }
 });
-/* ══════════════════════════════════════════════════════
-   REAL TEMPLE / HERITAGE SITE DATA
-   Sources: Wikipedia, ASI, UNESCO — founding years verified
-   ══════════════════════════════════════════════════════ */
-/* ══════════════════════════════════════════════════════
-   EXPANDED TEMPLE / HERITAGE SITE DATA (20 SITES)
-   ══════════════════════════════════════════════════════ */
-/* ══════════════════════════════════════════════════════
-   RAW TEMPLE DATA (350 SITES FROM CODEX)
-   ══════════════════════════════════════════════════════ */
+
 const RAW_SITES = [
   {id:1, era:-300, title:"Nataraja Temple, Chidambaram", state:"Tamil Nadu", lat:11.3996, lng:79.6937, desc:"Nataraja Temple, Chidambaram — Tamil Nadu. Site Antiquity: 300 BCE (Sangam Era). Current structure: 10th Century Chola."},
   {id:2, era:700, title:"Shore Temple, Mahabalipuram", state:"Tamil Nadu", lat:12.6165, lng:80.1992, desc:"Shore Temple, Mahabalipuram — Tamil Nadu. Est. 700 CE by Pallavas."},
@@ -394,14 +384,9 @@ const RAW_SITES = [
   {id:349, era:-3100, title:"Thanesar Sthaneshwar Mahadev", state:"Haryana", lat:29.9753, lng:76.8192, desc:"Thanesar Sthaneshwar Mahadev — Haryana. Site Antiquity: Mahabharata era (Worshipped by Pandavas before Kurukshetra war)."},
   {id:350, era:-3000, title:"Devi Talab Temple, Jalandhar", state:"Punjab", lat:31.326, lng:75.5762, desc:"Devi Talab Temple, Jalandhar — Punjab. Site Antiquity: Ancient Shakti Peetha (Right breast of Sati fell here)."}
 ];
-
-/* ══════════════════════════════════════════════════════
-   AUTOMATICALLY FORMAT THE DATA FOR OUR UI
-   This converts RAW_SITES into the exact format our map needs!
-   ══════════════════════════════════════════════════════ */
 const SITES = RAW_SITES.map(site => {
-    // Decide color based on keyword in title (just to add variety)
-    let siteColor = "#E8671A"; // Default Orange (Temple)
+    
+    let siteColor = "#E8671A"; 
     let siteType = "Temple";
     
     if (site.title.toLowerCase().includes("cave")) {
@@ -433,15 +418,8 @@ const SITES = RAW_SITES.map(site => {
         ]
     };
 });
-
-/* ══════════════════════════════════════════════════════
-   GLOBAL VLOGS
-   ══════════════════════════════════════════════════════ */
 const GLOBAL_VLOGS = [];
 
-/* ══════════════════════════════════════════════════════
-   MAP INITIALISATION
-   ══════════════════════════════════════════════════════ */
 const map = L.map('map', {
   center: [22.0, 80.0],
   zoom: 5,
@@ -449,13 +427,11 @@ const map = L.map('map', {
   scrollWheelZoom: true,
 });
 
-// Dark tile layer (CartoDB Dark Matter - Free & No Auth Required!)
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
     maxZoom: 20
 }).addTo(map);
 
-/* ── MARKER CREATION ─────────────────────────────── */
 function makeMarkerIcon(site) {
   return L.divIcon({
     className: '',
@@ -488,9 +464,6 @@ SITES.forEach(site => {
   markerMap[site.id] = m;
 });
 
-/* ══════════════════════════════════════════════════════
-   ERA SLIDER LOGIC
-   ══════════════════════════════════════════════════════ */
 function updateEra(value) {
     let year = Number(value);
     let periodText = "";
@@ -527,7 +500,6 @@ function updateEra(value) {
     const listEl = document.getElementById("siteList");
     listEl.innerHTML = "";
 
-    // ... (Keep the rest of the function EXACTLY the same below this line!) ...
 
     SITES.forEach(site => {
         const visible = site.era <= year;
@@ -556,9 +528,6 @@ function updateEra(value) {
     document.getElementById("siteCount").textContent = count;
 }
 
-/* ══════════════════════════════════════════════════════
-   POPUP ACTIONS  (global scope — called from inline HTML)
-   ══════════════════════════════════════════════════════ */
 window.showHistory = function(id) {
     const site = SITES.find(s => s.id === id);
     if (!site) return;
@@ -593,9 +562,6 @@ window.showSiteVlogs = function(id) {
     openModal(`📖 Vlogs — ${site.title}`, renderVlogs(site.vlogs));
 };
 
-/* ══════════════════════════════════════════════════════
-   MODAL
-   ══════════════════════════════════════════════════════ */
 function renderVlogs(vlogsArray) {
     if (vlogsArray.length === 0) return "<p>No community blogs yet. Be the first to write one!</p>";
 
@@ -635,9 +601,6 @@ document.getElementById("vlogBtn").addEventListener("click", () => {
     openModal("📖 Community Vlogs", renderVlogs(GLOBAL_VLOGS));
 });
 
-/* ══════════════════════════════════════════════════════
-   TOAST
-   ══════════════════════════════════════════════════════ */
 let toastTimer;
 function showToast(msg) {
     const t = document.getElementById("toast");
@@ -647,7 +610,6 @@ function showToast(msg) {
     toastTimer = setTimeout(() => t.classList.remove("show"), 2200);
 }
 
-/* ── ERA JUMP BUTTONS ───────────────────────────── */
 document.querySelectorAll(".jump-btn").forEach(btn => {
     btn.addEventListener("click", () => {
         const yr = parseInt(btn.dataset.year);
@@ -661,18 +623,7 @@ document.querySelectorAll(".jump-btn").forEach(btn => {
 
 /* ── INITIAL RENDER ─────────────────────────────── */
 updateEra(document.getElementById("erarange").value);
-/* ══════════════════════════════════════════════════════
-   WRITE A VLOG — localStorage (Firebase-ready)
-   ══════════════════════════════════════════════════════
 
-   TO SWITCH TO FIREBASE LATER:
-   1. npm install firebase  OR add Firebase CDN to index.html
-   2. Uncomment the Firebase lines below
-   3. Replace saveVlogLocally() call with saveVlogToFirebase()
-   4. Replace loadUserVlogs() body with loadVlogsFromFirebase()
-   ══════════════════════════════════════════════════════ */
-
-/* ── LOCALSTORAGE HELPERS ───────────────────────── */
 function saveVlogLocally(vlog) {
     const existing = JSON.parse(localStorage.getItem("bharatdarshnam_vlogs") || "[]");
     existing.unshift(vlog); // newest first
@@ -683,16 +634,12 @@ function loadUserVlogs() {
     return JSON.parse(localStorage.getItem("bharatdarshnam_vlogs") || "[]");
 }
 
-/* ══════════════════════════════════════════════════════
-   WRITE A VLOG — FIREBASE REAL-TIME DATABASE
-   ══════════════════════════════════════════════════════ */
 
-/* ── OPEN / CLOSE WRITE VLOG MODAL ─────────────── */
 document.getElementById("writeVlogBtn").addEventListener("click", () => {
     // Check if user is logged in before letting them write!
     if (!auth.currentUser) {
         showToast("⚠️ Please Sign In to write a vlog!");
-        // Auto-open the login modal for them
+      
         document.getElementById("loginModal").style.display = "flex";
         return;
     }
@@ -713,12 +660,10 @@ function closeWriteVlogModal() {
     document.getElementById("wv-error").textContent = "";
 }
 
-/* ── CHARACTER COUNTER ──────────────────────────── */
 document.getElementById("wv-text").addEventListener("input", function () {
     document.getElementById("wv-count").textContent = this.value.length;
 });
 
-/* ── SUBMIT VLOG TO FIREBASE ────────────────────── */
 document.getElementById("wv-submit").addEventListener("click", async () => {
     const author = document.getElementById("wv-author").value.trim();
     const site   = document.getElementById("wv-site").value.trim();
@@ -737,7 +682,7 @@ document.getElementById("wv-submit").addEventListener("click", async () => {
     const date = now.toLocaleString("en-IN", { month: "short", year: "numeric" });
 
     try {
-    // 🔥 Send the data to Firebase Firestore!
+ 
         await addDoc(collection(db, "vlogs"), {
             author: author,
             site: site,
@@ -745,7 +690,7 @@ document.getElementById("wv-submit").addEventListener("click", async () => {
             tags: tags,
             date: date,
             timestamp: Date.now(),
-            likes: 0 // <-- ADD THIS LINE!
+            likes: 0 
         });
 
         closeWriteVlogModal();
@@ -756,45 +701,39 @@ document.getElementById("wv-submit").addEventListener("click", async () => {
     }
 });
 
-/* ── FETCH VLOGS FROM FIREBASE REAL-TIME ────────── */
-// We use onSnapshot so the list updates instantly if someone else posts!
+
 document.getElementById("vlogBtn").addEventListener("click", () => {
     // Show a loading message first
     openModal("📖 Community Vlogs", "<div style='padding: 20px; text-align: center; color: #f4a340;'>Fetching real-time vlogs from database...</div>");
 
-    // Fetch from the 'vlogs' collection, ordered by newest first
     const q = query(collection(db, "vlogs"), orderBy("timestamp", "desc"));
     
 onSnapshot(q, (snapshot) => {
             const firebaseVlogs = [];
             snapshot.forEach((doc) => {
-                const data = doc.data(); // Grab the text data
-                data.id = doc.id;        // Grab the unique Firebase ID!
+                const data = doc.data(); 
+                data.id = doc.id;        
                 firebaseVlogs.push(data);
             });
-        // Combine the live Firebase vlogs with your hardcoded GLOBAL_VLOGS
+       
         const allVlogs = [...firebaseVlogs, ...GLOBAL_VLOGS];
-        
-        // Inject them into the modal!
+ 
         const modal = document.getElementById("vlogModal");
         if (modal.classList.contains("open")) {
             document.getElementById("modalBody").innerHTML = renderVlogs(allVlogs);
         }
     });
 });
-/* ══════════════════════════════════════════════════════
-   LOGIN MODAL & FIREBASE AUTH LOGIC
-   ══════════════════════════════════════════════════════ */
+
 const loginModal = document.getElementById("loginModal");
 const closeLoginModal = document.getElementById("closeLoginModal");
 
-// Fix for Module Scoping (Keeps your slider working!)
 window.updateEra = updateEra;
 
 // Open Modal
 document.getElementById("loginBtn").addEventListener("click", () => {
     if (auth.currentUser) {
-        // If logged in, log out!
+
         signOut(auth).then(() => showToast("Logged out successfully!"));
     } else {
         // Open the box
@@ -832,12 +771,11 @@ document.getElementById("signInBtn").addEventListener("click", () => {
         })
         .catch((error) => showToast("Wrong email or password!"));
 });
-/* ── HANDLE LIKES IN REAL-TIME ──────────────────── */
+
 document.getElementById("modalBody").addEventListener("click", async (e) => {
-    // Check if the user clicked a "like-btn"
+   
     if (e.target.classList.contains("like-btn")) {
         
-        // Stop users who aren't signed in from liking
         if (!auth.currentUser) {
             showToast("⚠️ Please Sign In to like this blog!");
             document.getElementById("loginModal").style.display = "flex";
@@ -846,19 +784,18 @@ document.getElementById("modalBody").addEventListener("click", async (e) => {
 
         const blogId = e.target.getAttribute("data-id");
         
-        // If it's one of your hardcoded GLOBAL_VLOGS, it won't have a Firebase ID yet
         if (!blogId || blogId === "undefined") {
             showToast("This is a legacy post and cannot be liked!");
             return;
         }
 
         try {
-            // Tell Firebase to add +1 to the likes!
+            
             const blogRef = doc(db, "vlogs", blogId);
             await updateDoc(blogRef, {
                 likes: increment(1)
             });
-            // You don't even need to refresh the page! onSnapshot will instantly update the number.
+        
         } catch (error) {
             console.error("Error liking blog:", error);
             showToast("⚠️ Error: Could not like post.");
