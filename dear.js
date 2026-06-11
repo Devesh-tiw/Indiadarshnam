@@ -19,7 +19,7 @@ const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-console.log("Firebase Connected! 🔥");
+console.log("Firebase Connected! ");
 
 // Listen for Login/Logout state
 onAuthStateChanged(auth, (user) => {
@@ -435,7 +435,7 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
 function makeMarkerIcon(site) {
   return L.divIcon({
     className: '',
-    html: `<div class="cm" style="background:${site.color}cc;border-color:${site.color}"><span class="mi">🛕</span></div>`,
+    html: `<div class="cm" style="background:${site.color}cc;border-color:${site.color}"><span class="mi">🕉️</span></div>`,
     iconSize: [32, 32],
     iconAnchor: [16, 32],
     popupAnchor: [0, -34],
@@ -455,9 +455,9 @@ SITES.forEach(site => {
         <div class="popup-state">📍 ${site.state}</div>
         <div class="popup-desc">${site.desc}</div>
         <div class="popup-actions">
-          <button class="popup-btn btn-history" onclick="showHistory(${site.id})"><span class="btn-icon">📜</span>History</button>
-          <button class="popup-btn btn-trip"    onclick="planTrip('${site.title.replace(/'/g,"\\'")}','${site.state}')"><span class="btn-icon">🏨</span>Plan Trip</button>
-          <button class="popup-btn btn-vlogs"   onclick="showSiteVlogs(${site.id})"><span class="btn-icon">📖</span>Vlogs</button>
+          <button class="popup-btn btn-history" onclick="showHistory(${site.id})"><span class="btn-icon"></span>History</button>
+         <button class="popup-btn btn-trip" onclick="planTrip('${site.title.replace(/'/g,"\\'")}','${site.state}', ${site.lat}, ${site.lng})"><span class="btn-icon"></span>Plan Trip</button>
+          <button class="popup-btn btn-vlogs"   onclick="showSiteVlogs(${site.id})"><span class="btn-icon"></span>Vlogs</button>
         </div>
       </div>`;
   }, { maxWidth: 270, className: '' });
@@ -483,7 +483,6 @@ function updateEra(value) {
     else if (year <= 1947)  periodText = "Colonial Era";
     else                    periodText = "Post-Independence";
 
-    // Update display (Use Math.abs so it says "10000 BCE" instead of "-10000 BCE")
     document.getElementById("era-number").textContent = Math.abs(year);
     document.getElementById("era-bce-ce").textContent = year < 0 ? "BCE" : "CE";
     document.getElementById("eraprint").textContent   = periodText;
@@ -528,29 +527,83 @@ function updateEra(value) {
 window.showHistory = function(id) {
     const site = SITES.find(s => s.id === id);
     if (!site) return;
+
+    // Build a smart Wikipedia search link using the temple's title
+    const wikiLink = `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(site.title)}`;
+
     openModal(
-        ` ${site.title}`,
+        `📜 ${site.title}`,
         `<div style="color:rgba(255,255,255,.7);font-size:13px;line-height:1.8;font-style:italic;margin-bottom:14px">${site.history}</div>
-         <div style="padding:10px 12px;border-radius:8px;background:rgba(212,160,23,.1);border:1px solid rgba(212,160,23,.3);font-size:11px;color:#c89040">
-            In the full app, this connects to the Wikipedia API for full articles, scholarly sources, and photo galleries.
+         
+         <div style="padding:12px; border-radius:8px; background:rgba(212,160,23,.1); border:1px solid rgba(212,160,23,.4); text-align:center;">
+           <a href="${wikiLink}" target="_blank" style="color:#f4a340; text-decoration:none; font-weight:bold; font-size: 13px; display: block;">
+             📚 Read full article on Wikipedia ↗
+           </a>
          </div>`
     );
 };
 
-window.planTrip = function(name, state) {
-    const hotels = [`${state} Heritage Haveli ★★★★★`, `The Palace Grand, ${state} ★★★★`, `Backpacker Dharamshala ★★★`, `Eco-Stay & Retreat ★★★★`];
+window.planTrip = async function(name, state, lat, lng) {
+    // 1. Show a loading state first
     openModal(
-        ` Plan Trip to ${name}`,
-        `<p style="color:rgba(255,255,255,.6);font-size:12px;margin-bottom:14px">Mock hotel listings near <strong style="color:#f4a340">${name}</strong>, ${state}</p>
-         <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px">
-           ${hotels.map(h => `<div style="padding:11px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);cursor:pointer" onmouseover="this.style.borderColor='rgba(244,163,64,.4)'" onmouseout="this.style.borderColor='rgba(255,255,255,.1)'">
-             <div style="font-size:11px;font-weight:600;color:rgba(255,255,255,.8);margin-bottom:2px">${h}</div>
-             <div style="font-size:10px;color:#8a6030">Mock price · Book now</div></div>`).join('')}
-         </div>
-         <div style="padding:9px 12px;border-radius:8px;background:rgba(45,106,79,.1);border:1px solid rgba(45,106,79,.3);font-size:11px;color:#6fcf97">
-            Live version integrates MakeMyTrip, Booking.com, and local homestay APIs.
+        `🏨 Plan Trip to ${name}`,
+        `<div style="text-align:center; padding: 20px; color: #f4a340;">
+            📡 Scanning the area for real hotels nearby...
          </div>`
     );
+
+    try {
+        // 2. Ask OpenStreetMap (Overpass API) for 4 hotels within 5km (5000 meters)
+        const query = `[out:json];node(around:5000,${lat},${lng})["tourism"="hotel"];out 4;`;
+        const url = `https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`;
+        
+        const response = await fetch(url);
+        const data = await response.json();
+
+        // 3. Format the results
+        let hotelHtml = "";
+        
+        if (data.elements && data.elements.length > 0) {
+            hotelHtml = data.elements.map(hotel => {
+                const hotelName = hotel.tags.name || "Local Guest House"; 
+                
+                // Generate a realistic mock price in Rupees (between ₹1000 and ₹4500)
+                const price = 1000 + Math.floor(Math.random() * 3500);
+                
+                // Create a Google Search link for this specific hotel near the temple
+                const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(hotelName + ' hotel near ' + name + ' ' + state)}`;
+
+                return `
+                <a href="${searchUrl}" target="_blank" style="text-decoration:none; display:block;">
+                    <div style="padding:11px;border-radius:9px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);cursor:pointer;transition:0.2s;" onmouseover="this.style.borderColor='rgba(244,163,64,.4)'; this.style.transform='translateY(-2px)';" onmouseout="this.style.borderColor='rgba(255,255,255,.1)'; this.style.transform='translateY(0)';">
+                        <div style="font-size:12px;font-weight:bold;color:#fff;margin-bottom:4px;">${hotelName}</div>
+                        <div style="font-size:10px;color:#aaa;margin-bottom:8px;">📍 ${Math.round(hotel.tags.distance || 0)}m away</div>
+                        
+                        <div style="display:flex; justify-content:space-between; align-items:center;">
+                            <span style="font-size:13px; color:#6fcf97; font-weight:bold;">₹${price} <span style="font-size:9px; color:#888; font-weight:normal;">/ night</span></span>
+                            <span style="font-size:10px; background:#f4a340; color:black; padding:3px 8px; border-radius:4px; font-weight:bold;">Book ↗</span>
+                        </div>
+                    </div>
+                </a>`;
+            }).join('');
+        } else {
+            hotelHtml = `<div style="color:#aaa; font-size:12px; grid-column: span 2; text-align:center; padding: 10px;">No registered hotels found within 5km on OpenStreetMap. Try searching nearby major cities!</div>`;
+        }
+
+        // 4. Update the modal with the real data
+        document.getElementById("modalBody").innerHTML = `
+            <p style="color:rgba(255,255,255,.6);font-size:12px;margin-bottom:14px">Real accommodations near <strong style="color:#f4a340">${name}</strong>, ${state}</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+                ${hotelHtml}
+            </div>
+            <div style="padding:9px 12px;border-radius:8px;background:rgba(45,106,79,.1);border:1px solid rgba(45,106,79,.3);font-size:11px;color:#6fcf97; text-align:center;">
+                Click any hotel to search availability and exact pricing.
+            </div>
+        `;
+        
+    } catch (error) {
+        document.getElementById("modalBody").innerHTML = `<div style="color:#ff6b6b; padding: 20px;">⚠️ Could not connect to the hotel database. Please try again later.</div>`;
+    }
 };
 
 window.showSiteVlogs = function(id) {
@@ -622,7 +675,7 @@ updateEra(document.getElementById("erarange").value);
 
 function saveVlogLocally(vlog) {
     const existing = JSON.parse(localStorage.getItem("bharatdarshnam_vlogs") || "[]");
-    existing.unshift(vlog); // newest first
+    existing.unshift(vlog); 
     localStorage.setItem("bharatdarshnam_vlogs", JSON.stringify(existing));
 }
 
