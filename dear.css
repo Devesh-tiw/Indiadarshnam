@@ -1,6 +1,81 @@
+/* ── CHOCOLATE WRAPPER REVEAL ───────────────────── */
+#wrapper-reveal {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    /* Keeps it above absolutely everything */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    pointer-events: none;
+    /* Stops it from blocking clicks after it opens */
+}
+
+.wrapper-left,
+.wrapper-right {
+    position: absolute;
+    top: 0;
+    width: 50vw;
+    height: 100vh;
+    background: linear-gradient(to bottom, #3a2318, #1a0f0a);
+    /* Rich chocolate brown */
+    transition: transform 1.5s cubic-bezier(0.77, 0, 0.175, 1);
+    z-index: 1;
+}
+
+.wrapper-left {
+    left: 0;
+    border-right: 2px solid #f4a340;
+}
+
+.wrapper-right {
+    right: 0;
+    border-left: 2px solid #f4a340;
+}
+
+.wrapper-logo {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    transition: opacity 0.8s ease;
+}
+
+/* The classes JavaScript will add to trigger the animation */
+.wrapper-open .wrapper-left {
+    transform: translateX(-100%);
+}
+
+.wrapper-open .wrapper-right {
+    transform: translateX(100%);
+}
+
+.wrapper-open .wrapper-logo {
+    opacity: 0;
+}
+
+/* ── ENTER BUTTON ───────────────────── */
+#enter-btn {
+    background: linear-gradient(135deg, #f4a340, #e07b10);
+    color: black;
+    border: none;
+    padding: 15px 40px;
+    font-size: 18px;
+    font-weight: 700;
+    border-radius: 30px;
+    cursor: pointer;
+    box-shadow: 0px 4px 15px rgba(244, 163, 64, 0.4);
+    transition: all 0.2s ease;
+}
+
+#enter-btn:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0px 6px 20px rgba(244, 163, 64, 0.6);
+}
+
 * {
     color: white;
 }
+
 
 #map {
     height: 100%;

@@ -447,7 +447,7 @@ const markerMap = {};
 SITES.forEach(site => {
   const m = L.marker([site.lat, site.lng], { icon: makeMarkerIcon(site) });
   
-  m.bindPopup(() => {
+ m.bindPopup(() => {
     const eraStr = site.era < 0 ? `${Math.abs(site.era)} BCE` : `${site.era} CE`;
     return `
       <div class="popup-inner">
@@ -457,14 +457,15 @@ SITES.forEach(site => {
         <div class="popup-desc">${site.desc}</div>
         <div class="popup-actions">
           <button class="popup-btn btn-history" onclick="showHistory(${site.id})"><span class="btn-icon"></span>History</button>
-          <button class="popup-btn btn-trip"    onclick="planTrip('${site.title.replace(/'/g,"\\'")}','${site.state}', ${site.lat}, ${site.lng})"><span class="btn-icon"></span>Plan Trip</button>
+          <button class="popup-btn btn-trip"    onclick="planTrip('${site.title.replace(/'/g,"\\'")}','${site.state}', ${site.lat}, ${site.lng})"><span class="btn-icon">🏨</span>Plan Trip</button>
           <button class="popup-btn btn-vlogs"   onclick="showSiteVlogs(${site.id})"><span class="btn-icon"></span>Blogs</button>
+          
+          <button class="popup-btn btn-write"   onclick="writeBlogForSite('${site.title.replace(/'/g,"\\'")}')"><span class="btn-icon"></span>Write</button>
+          
           <button class="popup-btn btn-route"   onclick="getRoute(${site.lat}, ${site.lng}, '${site.title.replace(/'/g,"\\'")}')"><span class="btn-icon"></span>Distance</button>
         </div>
       </div>`;
   }, { maxWidth: 280, className: '' });
-
-  // LIVE WEATHER MAGIC: The moment the popup opens, fetch the temperature!
   m.on('popupopen', async () => {
      try {
          const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${site.lat}&longitude=${site.lng}&current_weather=true`);
@@ -620,11 +621,11 @@ window.planTrip = async function(name, state, lat, lng) {
                 </div>
             `;
         } catch (error) {
-            document.getElementById("modalBody").innerHTML = `<div style="color:#ff6b6b; padding: 20px; text-align: center;">⚠️ Could not calculate route. Ensure you are connected to the internet and the destination is reachable by road.</div>`;
+            document.getElementById("modalBody").innerHTML = `<div style="color:#ff6b6b; padding: 20px; text-align: center;"> Could not calculate route. Ensure you are connected to the internet and the destination is reachable by road.</div>`;
         }
     }, (error) => {
         // If the user clicks "Deny" on the GPS popup
-        document.getElementById("modalBody").innerHTML = `<div style="color:#ff6b6b; padding: 20px; text-align: center;">⚠️ GPS Permission Denied.<br>We need your location to calculate the distance.</div>`;
+        document.getElementById("modalBody").innerHTML = `<div style="color:#ff6b6b; padding: 20px; text-align: center;"> GPS Permission Denied.<br>We need your location to calculate the distance.</div>`;
     });
 };
 
@@ -685,9 +686,46 @@ window.planTrip = async function(name, state, lat, lng) {
 window.showSiteVlogs = function(id) {
     const site = SITES.find(s => s.id === id);
     if (!site) return;
-    openModal(`Vlogs — ${site.title}`, renderVlogs(site.vlogs));
-};
 
+    // 1. Show a loading message while Firebase searches
+    openModal(`📖 Blogs — ${site.title}`, `<div style='padding: 20px; text-align: center; color: #f4a340;'>Fetching community blogs...</div>`);
+
+    // 2. Ask Firebase ONLY for blogs where the site name matches the temple clicked
+    const q = query(collection(db, "vlogs"), where("site", "==", site.title));
+    
+    onSnapshot(q, (snapshot) => {
+        const siteBlogs = [];
+        
+        // Grab all the real blogs you and your users have written
+        snapshot.forEach((doc) => {
+            const data = doc.data();
+            data.id = doc.id; 
+            siteBlogs.push(data);
+        });
+
+        // Sort them so the newest ones are at the top
+        siteBlogs.sort((a, b) => b.timestamp - a.timestamp);
+
+        // 3. Add a fallback placeholder (with the "undefined" bug fixed!)
+        // This ensures the page is never completely empty.
+        const fallbackBlog = {
+            author: "Yatri",
+            site: site.title, // <-- This fixes the 'undefined' title!
+            date: "2024",
+            text: `Visited ${site.title} recently. An incredible piece of architecture in ${site.state}!`,
+            likes: 0
+        };
+        
+        // Put the fallback at the bottom of the list
+        siteBlogs.push(fallbackBlog);
+
+        // 4. Render the blogs into the modal!
+        const modal = document.getElementById("vlogModal");
+        if (modal.classList.contains("open")) {
+            document.getElementById("modalBody").innerHTML = renderVlogs(siteBlogs);
+        }
+    });
+};
 function renderVlogs(vlogsArray) {
     if (vlogsArray.length === 0) return "<p>No community blogs yet. Be the first to write one!</p>";
 
@@ -955,4 +993,30 @@ document.getElementById("Privacy").addEventListener("click", () => {
         <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">If you have any questions or concerns about our privacy policy, please contact us at <a href="Agent:Devesh:9555208259" style="color:#f4a340;">Agent:Devesh:9555208259</a>.</p>
         <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">Thank you for trusting Bharat Darshnam with your information. We are dedicated to keeping it safe and secure.</p> `
     );
+});
+window.writeBlogForSite = function(siteTitle) {
+   
+    if (!auth.currentUser) {
+        showToast("⚠️ Please Sign In to write a blog!");
+        document.getElementById("loginModal").style.display = "flex";
+        return;
+    }
+    document.getElementById("writeVlogModal").classList.add("open");
+    
+    document.getElementById("wv-author").value = auth.currentUser.email.split('@')[0];
+    document.getElementById("wv-site").value = siteTitle;
+    
+    document.getElementById("wv-site").setAttribute("readonly", true);
+    document.getElementById("wv-site").style.opacity = "0.7";
+};
+
+window.addEventListener("load", () => {
+    setTimeout(() => {
+        const revealEl = document.getElementById("wrapper-reveal");
+        revealEl.classList.add("wrapper-open");
+        
+        setTimeout(() => {
+            revealEl.remove();
+        }, 2000);
+    }, 2000); //
 });
