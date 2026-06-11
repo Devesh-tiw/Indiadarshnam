@@ -446,21 +446,36 @@ const markerMap = {};
 
 SITES.forEach(site => {
   const m = L.marker([site.lat, site.lng], { icon: makeMarkerIcon(site) });
+  
   m.bindPopup(() => {
     const eraStr = site.era < 0 ? `${Math.abs(site.era)} BCE` : `${site.era} CE`;
     return `
       <div class="popup-inner">
         <div class="popup-era-tag">${eraStr} · ${site.type}</div>
-        <div class="popup-title">${site.title}</div>
+        <div class="popup-title">${site.title} <span id="weather-${site.id}" style="font-size: 11px; color: #4fc3f7; font-weight: normal; margin-left: 5px;">(🌤️...)</span></div>
         <div class="popup-state">📍 ${site.state}</div>
         <div class="popup-desc">${site.desc}</div>
         <div class="popup-actions">
           <button class="popup-btn btn-history" onclick="showHistory(${site.id})"><span class="btn-icon"></span>History</button>
-         <button class="popup-btn btn-trip" onclick="planTrip('${site.title.replace(/'/g,"\\'")}','${site.state}', ${site.lat}, ${site.lng})"><span class="btn-icon"></span>Plan Trip</button>
-          <button class="popup-btn btn-vlogs"   onclick="showSiteVlogs(${site.id})"><span class="btn-icon"></span>Vlogs</button>
+          <button class="popup-btn btn-trip"    onclick="planTrip('${site.title.replace(/'/g,"\\'")}','${site.state}', ${site.lat}, ${site.lng})"><span class="btn-icon"></span>Plan Trip</button>
+          <button class="popup-btn btn-vlogs"   onclick="showSiteVlogs(${site.id})"><span class="btn-icon"></span>Blogs</button>
+          <button class="popup-btn btn-route"   onclick="getRoute(${site.lat}, ${site.lng}, '${site.title.replace(/'/g,"\\'")}')"><span class="btn-icon"></span>Distance</button>
         </div>
       </div>`;
-  }, { maxWidth: 270, className: '' });
+  }, { maxWidth: 280, className: '' });
+
+  // LIVE WEATHER MAGIC: The moment the popup opens, fetch the temperature!
+  m.on('popupopen', async () => {
+     try {
+         const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${site.lat}&longitude=${site.lng}&current_weather=true`);
+         const data = await res.json();
+         const temp = data.current_weather.temperature;
+         document.getElementById(`weather-${site.id}`).innerHTML = `| 🌡️ ${temp}°C`;
+     } catch(err) {
+         document.getElementById(`weather-${site.id}`).innerHTML = ``; // Hide if it fails
+     }
+  });
+
   markerMap[site.id] = m;
 });
 
@@ -551,6 +566,67 @@ window.planTrip = async function(name, state, lat, lng) {
             📡 Scanning the area for real hotels nearby...
          </div>`
     );
+    window.getRoute = function(destLat, destLng, destName) {
+    // 1. Open the modal with a loading screen
+    openModal(
+        `🚗 Drive to ${destName}`,
+        `<div style="text-align:center; padding: 20px; color: #f4a340;">
+            📡 Getting your GPS location and calculating route...<br>
+            <span style="font-size:10px; color:#aaa;">(Please allow location access if your browser asks)</span>
+         </div>`
+    );
+
+    // 2. Check if the browser supports GPS
+    if (!navigator.geolocation) {
+        document.getElementById("modalBody").innerHTML = `<div style="color:#ff6b6b; padding: 20px; text-align: center;">⚠️ Geolocation is not supported by your browser.</div>`;
+        return;
+    }
+
+    // 3. Get the user's current exact location
+    navigator.geolocation.getCurrentPosition(async (position) => {
+        const userLat = position.coords.latitude;
+        const userLng = position.coords.longitude;
+
+        try {
+            // 4. Ask OSRM for the driving distance (Note: OSRM uses Longitude, Latitude format!)
+            const url = `https://router.project-osrm.org/route/v1/driving/${userLng},${userLat};${destLng},${destLat}?overview=false`;
+            
+            const response = await fetch(url);
+            const data = await response.json();
+
+            if (data.code !== "Ok" || !data.routes || data.routes.length === 0) {
+                throw new Error("No route found on land.");
+            }
+
+            // 5. Do the math to convert meters/seconds to kilometers/hours
+            const distanceKm = (data.routes[0].distance / 1000).toFixed(1);
+            const durationHrs = Math.floor(data.routes[0].duration / 3600);
+            const durationMins = Math.floor((data.routes[0].duration % 3600) / 60);
+
+            // 6. Create a Google Maps link so they can actually navigate there
+            const gMapsLink = `https://www.google.com/maps/dir/?api=1&origin=${userLat},${userLng}&destination=${destLat},${destLng}&travelmode=driving`;
+
+            // 7. Update the Modal!
+            document.getElementById("modalBody").innerHTML = `
+                <div style="text-align: center; padding: 10px;">
+                    <div style="font-size: 45px; margin-bottom: 10px;">🚗</div>
+                    <h2 style="color: white; margin-top: 0; margin-bottom: 5px;">${distanceKm} km away</h2>
+                    <p style="color: #ccc; font-size: 14px; margin-bottom: 25px;">Estimated Driving Time: <strong style="color: #f4a340; font-size: 16px;">${durationHrs}h ${durationMins}m</strong></p>
+                    
+                    <a href="${gMapsLink}" target="_blank" style="display: inline-block; background: #2da064; color: white; text-decoration: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; transition: 0.2s; border: 1px solid #1e7a4b;">
+                        📍 Start Navigation in Google Maps
+                    </a>
+                    <div style="margin-top: 15px; font-size: 10px; color: #555;">Live routing calculated via OSRM</div>
+                </div>
+            `;
+        } catch (error) {
+            document.getElementById("modalBody").innerHTML = `<div style="color:#ff6b6b; padding: 20px; text-align: center;">⚠️ Could not calculate route. Ensure you are connected to the internet and the destination is reachable by road.</div>`;
+        }
+    }, (error) => {
+        // If the user clicks "Deny" on the GPS popup
+        document.getElementById("modalBody").innerHTML = `<div style="color:#ff6b6b; padding: 20px; text-align: center;">⚠️ GPS Permission Denied.<br>We need your location to calculate the distance.</div>`;
+    });
+};
 
     try {
         // 2. Ask OpenStreetMap (Overpass API) for 4 hotels within 5km (5000 meters)
