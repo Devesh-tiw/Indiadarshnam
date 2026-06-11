@@ -795,3 +795,35 @@ document.getElementById("modalBody").addEventListener("click", async (e) => {
         }
     }
 });
+
+document.getElementById("About").addEventListener("click", () => {
+    openModal("About Bharat Darshnam", `
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">Bharat Darshnam is a passion project to create an interactive map of India's heritage sites, blending history, culture, and travel. It was built in 2024 by a solo developer with love for Indian history and technology. The goal is to inspire exploration and appreciation of India's rich heritage through a user-friendly digital experience.</p>
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">This project is a labor of love and is currently in its early stages. The map features 350+ heritage sites across India, with plans to expand to 1000+ sites in the future. Each site includes historical information, photos, and community vlogs contributed by users.</p>
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">The platform is built using Leaflet.js for mapping and Firebase for user authentication and real-time database functionality. It is designed to be mobile-friendly and accessible to users of all ages.</p>
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">Future plans include adding more interactive features such as virtual tours, augmented reality experiences, and integration with travel booking platforms. The vision is to create a comprehensive digital companion for anyone interested in exploring India's heritage, whether they are planning a trip or just want to learn more from home.</p>
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">Thank you for visiting Bharat Darshnam! We hope it inspires you to discover and appreciate the incredible heritage of India.</p>
+    `);
+});
+
+document.getElementById("Contact").addEventListener("click", () => {
+    openModal("Contact Us", `
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">We'd love to hear from you! Whether you have suggestions for new features, want to contribute content, or just want to say hello, feel free to reach out.</p>
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">Email: <a href="Agent:Devesh:9555208259" style="color:#f4a340;">Agent:Devesh:9555208259</a></p>
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">Social Media: @BharatDarshnam on Twitter, Instagram, and Facebook</p>
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">We also welcome contributions to our community vlogs! If you've visited a heritage site and want to share your experience, please sign in and write a vlog.</p>
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">Thank you for being part of the Bharat Darshnam community!</p>
+    `);
+});
+
+
+document.getElementById("Privacy").addEventListener("click", () => {
+    openModal("Privacy Policy", `
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">Bharat Darshnam is committed to protecting your privacy. We do not sell or share your personal information with third parties. The only data we collect is for user authentication and to enable community features such as vlogs and likes.</p>
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">When you create an account, we collect your email address for authentication purposes. This information is stored securely in our Firebase database and is not shared with any external parties.</p>
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">You can choose to write community vlogs which are stored in our database and visible to other users. These vlogs include the author name, site name, text, tags, date, and like count. You can delete your vlogs by contacting us directly.</p>
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">We use cookies to enhance your experience on our site, such as keeping you logged in and remembering your preferences. You can disable cookies in your browser settings, but this may affect the functionality of the site.</p>
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">If you have any questions or concerns about our privacy policy, please contact us at <a href="Agent:Devesh:9555208259" style="color:#f4a340;">Agent:Devesh:9555208259</a>.</p>
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">Thank you for trusting Bharat Darshnam with your information. We are dedicated to keeping it safe and secure.</p> `
+    );
+});

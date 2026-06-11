@@ -551,3 +551,8 @@ body {
 .wv-firebase-note strong {
     color: #f4a340;
 }
+#About,
+#Contact,
+#Privacy {
+    cursor: pointer;
+}
