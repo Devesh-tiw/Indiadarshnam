@@ -809,7 +809,7 @@ document.getElementById("About").addEventListener("click", () => {
 document.getElementById("Contact").addEventListener("click", () => {
     openModal("Contact Us", `
         <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">We'd love to hear from you! Whether you have suggestions for new features, want to contribute content, or just want to say hello, feel free to reach out.</p>
-        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">Email: <a href="Agent:Devesh:9555208259" style="color:#f4a340;">Agent:Devesh:9555208259</a></p>
+        <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">Email: <a href="Devesh:9555208259" style="color:#f4a340;">Agent:Devesh:9555208259</a></p>
         <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">Social Media: @BharatDarshnam on Twitter, Instagram, and Facebook</p>
         <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">We also welcome contributions to our community vlogs! If you've visited a heritage site and want to share your experience, please sign in and write a vlog.</p>
         <p style="color:rgba(255,255,255,.7);font-size:14px;line-height:1.6;">Thank you for being part of the Bharat Darshnam community!</p>
