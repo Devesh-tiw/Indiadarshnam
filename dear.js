@@ -1,6 +1,5 @@
 console.log("BharatDarshnam loaded");
 
-// Import Firebase tools
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, doc, updateDoc, increment } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
@@ -14,14 +13,12 @@ const firebaseConfig = {
   appId: "1:51488619362:web:b73bdd05cb3dd1a649ca3b"
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
 console.log("Firebase Connected! ");
 
-// Listen for Login/Logout state
 onAuthStateChanged(auth, (user) => {
   const loginBtn = document.getElementById("loginBtn");
   if (user) {
@@ -453,7 +450,7 @@ SITES.forEach(site => {
       <div class="popup-inner">
         <div class="popup-era-tag">${eraStr} · ${site.type}</div>
         <div class="popup-title">${site.title} <span id="weather-${site.id}" style="font-size: 11px; color: #4fc3f7; font-weight: normal; margin-left: 5px;">(🌤️...)</span></div>
-        <div class="popup-state">📍 ${site.state}</div>
+        <div class="popup-state"> ${site.state}</div>
         <div class="popup-desc">${site.desc}</div>
         <div class="popup-actions">
           <button class="popup-btn btn-history" onclick="showHistory(${site.id})"><span class="btn-icon"></span>History</button>
@@ -486,7 +483,6 @@ function updateEra(value) {
     document.getElementById("eraprint").style.visibility = "visible";
     document.getElementById("eraprint").style.display = "block";
 
-    // 2. Added ancient timeline names!
     if      (year <= -8000) periodText = "Satya Yuga / Puranic Era";
     else if (year <= -4000) periodText = "Treta Yuga / Ramayana Era";
     else if (year <= -3000) periodText = "Dvapara Yuga / Mahabharata Era";
@@ -522,7 +518,6 @@ function updateEra(value) {
             if (map.hasLayer(markerMap[site.id])) map.removeLayer(markerMap[site.id]);
         }
 
-        // Sidebar card
         const eraStr = site.era < 0 ? `${Math.abs(site.era)} BCE` : `${site.era} CE`;
         const card = document.createElement("div");
         card.className = "site-card" + (visible ? "" : " locked");
@@ -543,12 +538,10 @@ function updateEra(value) {
 window.showHistory = function(id) {
     const site = SITES.find(s => s.id === id);
     if (!site) return;
-
-    // Build a smart Wikipedia search link using the temple's title
     const wikiLink = `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(site.title)}`;
 
     openModal(
-        `📜 ${site.title}`,
+        ` ${site.title}`,
         `<div style="color:rgba(255,255,255,.7);font-size:13px;line-height:1.8;font-style:italic;margin-bottom:14px">${site.history}</div>
          
          <div style="padding:12px; border-radius:8px; background:rgba(212,160,23,.1); border:1px solid rgba(212,160,23,.4); text-align:center;">
@@ -646,8 +639,7 @@ window.planTrip = async function(name, state, lat, lng) {
                 
                 // Generate a realistic mock price in Rupees (between ₹1000 and ₹4500)
                 const price = 1000 + Math.floor(Math.random() * 3500);
-                
-                // Create a Google Search link for this specific hotel near the temple
+          
                 const searchUrl = `https://www.google.com/search?q=${encodeURIComponent(hotelName + ' hotel near ' + name + ' ' + state)}`;
 
                 return `
@@ -716,10 +708,8 @@ window.showSiteVlogs = function(id) {
             likes: 0
         };
         
-        // Put the fallback at the bottom of the list
         siteBlogs.push(fallbackBlog);
 
-        // 4. Render the blogs into the modal!
         const modal = document.getElementById("vlogModal");
         if (modal.classList.contains("open")) {
             document.getElementById("modalBody").innerHTML = renderVlogs(siteBlogs);
