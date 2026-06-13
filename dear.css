@@ -630,3 +630,38 @@ body {
 #Privacy {
     cursor: pointer;
 }
+/* --- DEFAULT DARK THEME VARIABLES --- */
+:root {
+    --app-bg: linear-gradient(to bottom, #1a0f0a, #3a2318);
+    /* Dark Chocolate */
+    --panel-bg: rgba(0, 0, 0, 0.6);
+    --text-primary: #ffffff;
+    --text-secondary: #cccccc;
+    --border-color: rgba(244, 163, 64, 0.3);
+}
+
+/* --- LIGHT THEME VARIABLES --- */
+[data-theme="light"] {
+    --app-bg: linear-gradient(to bottom, #fdf6e3, #f5deb3);
+    /* Warm Sand/Parchment */
+    --panel-bg: rgba(255, 255, 255, 0.7);
+    --text-primary: #333333;
+    --text-secondary: #555555;
+    --border-color: rgba(200, 120, 30, 0.4);
+}
+
+/* Update your body and panels to use these variables! */
+body {
+    background: var(--app-bg);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.glass-panel {
+    background: var(--panel-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+/* Notice we DO NOT change #indiaarea (the map) so it stays dark and readable! */

@@ -1010,3 +1010,28 @@ window.addEventListener("load", () => {
         }, 2000);
     }, 2000); //
 });
+/* ── THEME TOGGLE LOGIC ───────────── */
+const themeToggleBtn = document.getElementById("theme-toggle");
+const currentTheme = localStorage.getItem("theme") || "dark"; // Default to dark
+
+// Apply saved theme on load
+if (currentTheme === "light") {
+    document.documentElement.setAttribute("data-theme", "light");
+    themeToggleBtn.innerHTML = "⚙️ ☀️";
+}
+
+themeToggleBtn.addEventListener("click", () => {
+    let theme = document.documentElement.getAttribute("data-theme");
+    
+    if (theme === "light") {
+        // Switch to Dark
+        document.documentElement.removeAttribute("data-theme");
+        localStorage.setItem("theme", "dark");
+        themeToggleBtn.innerHTML = " 🌙";
+    } else {
+        // Switch to Light
+        document.documentElement.setAttribute("data-theme", "light");
+        localStorage.setItem("theme", "light");
+        themeToggleBtn.innerHTML = " ☀️";
+    }
+});
