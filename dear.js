@@ -1017,7 +1017,7 @@ const currentTheme = localStorage.getItem("theme") || "dark"; // Default to dark
 // Apply saved theme on load
 if (currentTheme === "light") {
     document.documentElement.setAttribute("data-theme", "light");
-    themeToggleBtn.innerHTML = "⚙️ ☀️";
+    themeToggleBtn.innerHTML = " ☀️";
 }
 
 themeToggleBtn.addEventListener("click", () => {
