@@ -1028,6 +1028,7 @@ themeToggleBtn.addEventListener("click", () => {
         document.documentElement.removeAttribute("data-theme");
         localStorage.setItem("theme", "dark");
         themeToggleBtn.innerHTML = " 🌙";
+        
     } else {
         // Switch to Light
         document.documentElement.setAttribute("data-theme", "light");
