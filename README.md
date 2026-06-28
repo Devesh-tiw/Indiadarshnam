@@ -1,5 +1,5 @@
 
-<h3>To visit the visit click on the image </h3>
+<h3>To visit the website click on the image </h3>
 <a href="https://devesh-tiw.github.io/Indiadarshnam/"><img src="https://www.bharatdarshan.today/static/media/logo.947c4ba487a367223742.png"></a>
 
 # Indiadarshnam
